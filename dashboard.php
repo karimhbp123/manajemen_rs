@@ -1,0 +1,1075 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['login'])) {
+  header("Location: index.php");
+  exit;
+}
+
+// base
+$base_url  = '/manajemen_rs/';
+$base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
+
+// ✅ koneksi HARUS di atas
+require_once($base_path . 'config/db.php');
+
+// QUERY NOTIF (SEMUA JENIS PEGAWAI)
+$queryNotif = "
+SELECT 
+  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) < 0 THEN 1 ELSE 0 END) as expired,
+  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 30 THEN 1 ELSE 0 END) as warning,
+  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) > 30 THEN 1 ELSE 0 END) as aman
+FROM (
+    SELECT masa_berlaku FROM pegawai_pns
+    UNION ALL
+    SELECT masa_berlaku FROM pegawai_p3k_penuh_waktu
+    UNION ALL
+    SELECT masa_berlaku FROM pegawai_p3k_paruh_waktu
+    UNION ALL
+    SELECT masa_berlaku FROM pegawai_kontrak
+    UNION ALL
+    SELECT masa_berlaku FROM pegawai_tetap
+    UNION ALL
+    SELECT masa_berlaku FROM pegawai_mitra
+) AS semua_pegawai
+WHERE masa_berlaku IS NOT NULL
+AND masa_berlaku != '0000-00-00'
+";
+
+$resultNotif = $koneksi->query($queryNotif);
+
+if ($resultNotif && $resultNotif->num_rows > 0) {
+  $data = $resultNotif->fetch_assoc();
+
+  $expired = $data['expired'] ?? 0;
+  $warning = $data['warning'] ?? 0;
+  $aman = $data['aman'] ?? 0;
+} else {
+  $expired = 0;
+  $warning = 0;
+  $aman = 0;
+}
+
+
+$querySoon = "
+SELECT nama, masa_berlaku, jenis
+FROM (
+    SELECT nama, masa_berlaku, 'PNS' as jenis 
+    FROM pegawai_pns
+
+    UNION ALL
+
+    SELECT nama, masa_berlaku, 'P3K Penuh Waktu' as jenis 
+    FROM pegawai_p3k_penuh_waktu
+
+    UNION ALL
+
+    SELECT nama, masa_berlaku, 'P3K Paruh Waktu' as jenis 
+    FROM pegawai_p3k_paruh_waktu
+
+    UNION ALL
+
+    SELECT nama, masa_berlaku, 'Kontrak' as jenis 
+    FROM pegawai_kontrak
+
+    UNION ALL
+
+    SELECT nama, masa_berlaku, 'Tetap' as jenis 
+    FROM pegawai_tetap
+
+    UNION ALL
+
+    SELECT nama, masa_berlaku, 'Mitra' as jenis 
+    FROM pegawai_mitra
+
+) AS semua_pegawai
+WHERE masa_berlaku IS NOT NULL
+AND masa_berlaku != '0000-00-00'
+AND DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 30
+ORDER BY masa_berlaku ASC
+LIMIT 5
+";
+
+$resultSoon = $koneksi->query($querySoon);
+
+// QUERY TOTAL PEGAWAI (SEMUA TABEL)
+$queryTotal = "
+SELECT 
+  (
+    (SELECT COUNT(*) FROM pegawai_p3k_paruh_waktu 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') +
+
+    (SELECT COUNT(*) FROM pegawai_tetap 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') +
+
+    (SELECT COUNT(*) FROM pegawai_kontrak 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') +
+
+    (SELECT COUNT(*) FROM pegawai_mitra 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') +
+
+    (SELECT COUNT(*) FROM pegawai_pns 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') +
+
+    (SELECT COUNT(*) FROM pegawai_p3k_penuh_waktu 
+     WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF')
+  ) AS total
+";
+
+$resultTotal = $koneksi->query($queryTotal);
+
+if ($resultTotal && $resultTotal->num_rows > 0) {
+  $dataTotal = $resultTotal->fetch_assoc();
+  $totalPegawai = $dataTotal['total'] ?? 0;
+} else {
+  $totalPegawai = 0;
+}
+
+// QUERY JUMLAH PER JENIS
+$queryJenis = "
+SELECT 
+  (SELECT COUNT(*) FROM pegawai_pns 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as pns,
+
+  (SELECT COUNT(*) FROM pegawai_p3k_penuh_waktu 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as p3k_full,
+
+  (SELECT COUNT(*) FROM pegawai_p3k_paruh_waktu 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as p3k_part,
+
+  (SELECT COUNT(*) FROM pegawai_tetap 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as tetap,
+
+  (SELECT COUNT(*) FROM pegawai_kontrak 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as kontrak,
+
+  (SELECT COUNT(*) FROM pegawai_mitra 
+   WHERE TRIM(UPPER(status_pegawai)) = 'AKTIF') as mitra
+";
+
+$resultJenis = $koneksi->query($queryJenis);
+
+if ($resultJenis && $resultJenis->num_rows > 0) {
+  $jenis = $resultJenis->fetch_assoc();
+
+  $jmlPns = $jenis['pns'] ?? 0;
+  $jmlP3kFull = $jenis['p3k_full'] ?? 0;
+  $jmlP3kPart = $jenis['p3k_part'] ?? 0;
+  $jmlTetap = $jenis['tetap'] ?? 0;
+  $jmlKontrak = $jenis['kontrak'] ?? 0;
+  $jmlMitra = $jenis['mitra'] ?? 0;
+} else {
+  $jmlPns = $jmlP3kFull = $jmlP3kPart = $jmlTetap = $jmlKontrak = $jmlMitra = 0;
+}
+
+// QUERY PENSIUN (PNS)
+$queryPensiun = "
+SELECT COUNT(*) as total
+FROM (
+  SELECT 
+    DATE_ADD(
+      tgl_lahir, 
+      INTERVAL 
+      (CASE 
+        WHEN LOWER(IFNULL(nama_jabatan,'')) LIKE '%madya%' THEN 60
+        ELSE 58
+      END) YEAR
+    ) AS tanggal_pensiun,
+
+    DATEDIFF(
+      DATE_ADD(
+        tgl_lahir, 
+        INTERVAL 
+        (CASE 
+          WHEN LOWER(IFNULL(nama_jabatan,'')) LIKE '%madya%' THEN 60
+          ELSE 58
+        END) YEAR
+      ), 
+      CURDATE()
+    ) AS sisa_hari
+
+  FROM pegawai_pns
+  WHERE tgl_lahir IS NOT NULL
+  AND tgl_lahir != '0000-00-00'
+) AS data
+WHERE sisa_hari BETWEEN 0 AND 365
+";
+
+$resultPensiun = $koneksi->query($queryPensiun);
+
+if ($resultPensiun && $resultPensiun->num_rows > 0) {
+  $dataPensiun = $resultPensiun->fetch_assoc();
+  $pensiun = $dataPensiun['total'] ?? 0;
+} else {
+  $pensiun = 0;
+}
+?>
+
+<?php require_once($base_path . 'layout/header.php'); ?>
+<?php require_once($base_path . 'layout/sidebar.php'); ?>
+<?php require_once($base_path . 'config/db.php'); ?>
+
+<style>
+  /* GLOBAL LAYOUT */
+  html,
+  body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  .content-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  /* NOTIF CARD - MODERN PREMIUM */
+  .notif-card-modern {
+    position: relative;
+    border-radius: 18px;
+    padding: 15px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff, #f9fafb);
+    border: 1px solid #e5e7eb;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 200px;
+    min-height: 95px;
+  }
+
+  /* glow background */
+  .notif-card-modern::before {
+    content: "";
+    position: absolute;
+    width: 160%;
+    height: 160%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.12), transparent 70%);
+    transform: rotate(25deg);
+    pointer-events: none;
+  }
+
+  /* shine hover */
+  .notif-card-modern::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: 0.5s;
+  }
+
+  .notif-card-modern:hover::after {
+    left: 120%;
+  }
+
+  /* content */
+  .card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* TEXT */
+  .card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    max-width: 65%;
+  }
+
+  /* ANGKA */
+  .card-text .num {
+    font-size: 30px;
+    font-weight: 800;
+    color: #111827;
+    line-height: 1;
+  }
+
+  /* LABEL */
+  .card-text .label {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    opacity: 0.9;
+    color: #6b7280;
+    line-height: 1.2;
+  }
+
+  .card-text .label::before {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  /* WARNA SESUAI STATUS */
+  .notif-card-modern.danger .label {
+    color: #ef4444;
+  }
+
+  .notif-card-modern.warning .label {
+    color: #f59e0b;
+  }
+
+  .notif-card-modern.success .label {
+    color: #10b981;
+  }
+
+  .notif-card-modern.primary .label {
+    color: #4f46e5;
+  }
+
+  .notif-card-modern.danger .num {
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  }
+
+  .notif-card-modern.warning .num {
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+
+  .notif-card-modern.success .num {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+
+  .notif-card-modern.primary .num {
+    text-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ICON FLOAT */
+  .card-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+  }
+
+  /* PROGRESS */
+  .card-progress {
+    height: 4px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    overflow: hidden;
+  }
+
+  .card-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  /* HOVER */
+  .notif-card-modern:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  }
+
+  /* MERAH */
+  .notif-card-modern.danger .card-icon {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .notif-card-modern.danger .card-progress span {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  /* ORANGE */
+  .notif-card-modern.warning .card-icon {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .notif-card-modern.warning .card-progress span {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+
+  /* HIJAU */
+  .notif-card-modern.success .card-icon {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+
+  .notif-card-modern.success .card-progress span {
+    background: linear-gradient(90deg, #10b981, #34d399);
+  }
+
+  .notif-card-modern.primary .card-icon {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+  }
+
+  .notif-card-modern.primary .card-progress span {
+    background: linear-gradient(90deg, #6366f1, #4f46e5);
+  }
+
+  /* JENIS PEGAWAI */
+  .jenis-wrapper {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+  }
+
+  .jenis-wrapper-notif {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    margin-bottom: 8px;
+  }
+
+  .jenis-header h5 {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .jenis-header span {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* grid */
+  .jenis-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  /* CARD BASE */
+  .jenis-card {
+    position: relative;
+    overflow: hidden;
+    height: 170px;
+    padding: 15px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    cursor: pointer;
+  }
+
+  .jenis-card:active {
+    transform: scale(0.97);
+  }
+
+  /* glow subtle */
+  .jenis-card::before {
+    content: "";
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    top: -40%;
+    left: -40%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.07), transparent 70%);
+    pointer-events: none;
+  }
+
+  .jenis-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(110deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.25) 50%,
+        transparent 60%);
+    transition: 0.6s;
+    pointer-events: none;
+  }
+
+  .jenis-card:hover::after {
+    left: 120%;
+  }
+
+  /* hover */
+  .jenis-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ICON */
+  .jenis-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    margin-top: 1px;
+  }
+
+  .jenis-card:hover .jenis-icon {
+    transform: translateY(-6px) scale(1.05);
+  }
+
+  /* TITLE */
+  .jenis-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* PROGRESS */
+  .jenis-progress {
+    flex: 1;
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* PERSEN */
+  .jenis-percent {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .jenis-card:hover .jenis-title {
+    color: #4f46e5;
+  }
+
+  /* DEFAULT */
+  .jenis-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #4f46e5, #6366f1);
+    transition: width 0.4s ease;
+  }
+
+  /* PNS */
+  .jenis-card.pns .jenis-progress span {
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  }
+
+  /* P3K FULL */
+  .jenis-card.p3kfull .jenis-progress span {
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+  }
+
+  /* P3K PART */
+  .jenis-card.p3kpart .jenis-progress span {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  }
+
+  /* TETAP */
+  .jenis-card.tetap .jenis-progress span {
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+  }
+
+  /* KONTRAK */
+  .jenis-card.kontrak .jenis-progress span {
+    background: linear-gradient(90deg, #ef4444, #f87171);
+  }
+
+  /* MITRA */
+  .jenis-card.mitra .jenis-progress span {
+    background: linear-gradient(90deg, #a855f7, #c084fc);
+  }
+
+  /* PRIMARY */
+  .jenis-card.primary .jenis-icon {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+  }
+
+  /* PNS */
+  .jenis-card.pns .jenis-icon {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  }
+
+  /* P3K FULL */
+  .jenis-card.p3kfull .jenis-icon {
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+  }
+
+  /* P3K PART */
+  .jenis-card.p3kpart .jenis-icon {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  }
+
+  /* TETAP */
+  .jenis-card.tetap .jenis-icon {
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+  }
+
+  /* KONTRAK */
+  .jenis-card.kontrak .jenis-icon {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+  }
+
+  /* MITRA */
+  .jenis-card.mitra .jenis-icon {
+    background: linear-gradient(135deg, #a855f7, #c084fc);
+  }
+
+  .jenis-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  /* MODAL */
+  .modal-header.custom-header {
+    position: relative;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    padding: 18px 20px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-header.custom-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #22d3ee, #a78bfa);
+    opacity: 0.8;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .modal-title i {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .close-btn:hover {
+    background: #ef4444;
+    transform: rotate(90deg) scale(1.05);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+  }
+
+  .modal-dialog {
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+  }
+
+  .modal-body {
+    background: #f9fafb;
+    padding: 18px;
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+  }
+
+  /* HEADER DASHBOARD */
+  .content-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .jenis-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .jenis-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 8px 18px rgba(79, 70, 229, 0.3);
+  }
+
+  .jenis-header h5 {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+    color: #111827;
+  }
+
+  .jenis-header span {
+    font-size: 12px;
+    color: #6b7280;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* TOP */
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* BOTTOM */
+  .card-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* PROGRESS */
+  .card-progress {
+    flex: 1;
+    height: 5px;
+    border-radius: 10px;
+    background: #e5e7eb;
+    overflow: hidden;
+  }
+
+  /* PERSENTASE */
+  .card-percent {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    min-width: 35px;
+    text-align: right;
+  }
+
+  /* TITLE DI BAWAH */
+  .jenis-title-below {
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
+    transition: 0.3s;
+    margin-top: 4px;
+  }
+
+  /* HEADER (ICON + VALUE) */
+  .jenis-header-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* LEFT SIDE (ICON + TITLE) */
+  .jenis-header-card .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* VALUE */
+  .jenis-value {
+    font-size: 30px;
+    font-weight: 800;
+    color: #111827;
+  }
+
+  /* FOOTER */
+  .jenis-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .jenis-card:hover .jenis-title-below {
+    color: #4f46e5;
+    transform: translateY(-2px);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .notif-col {
+    flex: 0 0 auto;
+  }
+
+  .notif-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 215px);
+    margin-top: 10px;
+  }
+
+  .medis-highlight {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff, #f8fafc);
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .medis-highlight:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  /* kiri */
+  .medis-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .medis-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+  }
+
+  /* text */
+  .medis-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .medis-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  .medis-sub {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* kanan (angka besar) */
+  .medis-right {
+    font-size: 36px;
+    font-weight: 800;
+    color: #4f46e5;
+  }
+</style>
+
+<div class="content-wrapper">
+  <section class="content-header">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <div class="jenis-header">
+        <div class="jenis-title-wrap">
+          <div class="jenis-badge">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <div>
+            <h5>Dashboard Pegawai</h5>
+            <span>Ringkasan berdasarkan jenis kepegawaian</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="jenis-wrapper-notif">
+        <div class="jenis-header">
+          <h5>Monitoring Status Pegawai</h5>
+          <span>Notifikasi masa berlaku SIP, tahun lulus, dan data penting lainnya</span>
+        </div>
+        <!-- SUMMARY CARD (PREMIUM GRID) -->
+        <div class="notif-grid">
+          <!-- CARD -->
+          <?php
+          function cardNotif($class, $num, $label, $icon, $onclick = '', $total = 100)
+          {
+            $percent = $total > 0 ? round(($num / $total) * 100) : 0;
+            return "
+            <div class='notif-col'>
+              <div class='notif-card-modern $class' $onclick>
+                <div class='card-top'>
+             
+                  <div class='card-icon'>
+                    <i class='fas $icon'></i>
+                  </div>
+               
+                  <div class='card-text' style='text-align:right'>
+                    <span class='label'>$label</span>
+                    <span class='num'>$num</span>
+                  </div>
+                </div>
+                <div class='card-bottom'>
+                  <div class='card-progress'>
+                    <span style='width: {$percent}%'></span>
+                  </div>
+                  <div class='card-percent'>
+                    {$percent}%
+                  </div>
+                </div>
+              </div>
+            </div>";
+          }
+          $totalNotif = $expired + $warning + $aman;
+          echo cardNotif('primary', $pensiun, 'PENSIUN', 'fa-user-clock', "onclick=\"loadNotif('pensiun')\"", $totalPegawai);
+          echo cardNotif('danger', $expired, 'SIP HABIS', 'fa-exclamation-triangle', "onclick=\"loadNotif('expired')\"", $totalNotif);
+          echo cardNotif('warning', $warning, 'SIP ≤ 30 HARI', 'fa-clock', "onclick=\"loadNotif('warning')\"", $totalNotif);
+          echo cardNotif('success', $aman, 'SIP > 30 HARI', 'fa-check-circle', "onclick=\"loadNotif('aman')\"", $totalNotif);
+          ?>
+        </div>
+      </div>
+      <!-- JENIS PEGAWAI (GLASS GRID) -->
+      <div class="jenis-wrapper">
+        <div class="jenis-header">
+          <h5>Distribusi Pegawai</h5>
+          <span>Komposisi pegawai berdasarkan jenis kepegawaian</span>
+        </div>
+        <div class="jenis-row">
+          <?php
+          function cardJenis($title, $num, $icon, $class, $total = 0, $url = '#')
+          {
+            $percent = $total > 0 ? round(($num / $total) * 100) : 0;
+            return "
+            <div class='jenis-card $class' onclick=\"window.location.href='$url'\">
+              <div class='jenis-header-card'>
+                <div class='jenis-icon'>
+                  <i class='fas $icon'></i>
+                </div>
+                <div class='jenis-value'>
+                  $num
+                </div>
+              </div>
+              <div class='jenis-title-below'>
+                $title
+              </div>
+              <div class='jenis-footer'>
+                <div class='jenis-progress'>
+                  <span style='width: {$percent}%'></span>
+                </div>
+                <span class='jenis-percent'>{$percent}%</span>
+              </div>
+            </div>";
+          }
+          echo cardJenis('Total Pegawai', $totalPegawai, 'fa-users', 'primary', $totalPegawai, '');
+          echo cardJenis('Pegawai Negeri Sipil', $jmlPns, 'fa-user-tie', 'pns', $totalPegawai, 'pages/PNS');
+          echo cardJenis('PPPK Penuh Waktu', $jmlP3kFull, 'fa-user-check', 'p3kfull', $totalPegawai,  'pages/P3K-Penuh-Waktu');
+          echo cardJenis('PPPK Paruh Waktu', $jmlP3kPart, 'fa-user-clock', 'p3kpart', $totalPegawai, 'pages/P3K-Paruh-Waktu');
+          echo cardJenis('Pegawai Tetap', $jmlTetap, 'fa-id-card', 'tetap', $totalPegawai, 'pages/Tetap');
+          echo cardJenis('Pegawai Kontrak', $jmlKontrak, 'fa-file-contract', 'kontrak', $totalPegawai, 'pages/Kontrak');
+          echo cardJenis('Pegawai Mitra', $jmlMitra, 'fa-handshake-angle', 'mitra', $totalPegawai, 'pages/Mitra');          ?>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>
+    function loadNotif(type) {
+      let title = '';
+      let url = '';
+      if (type === 'expired') {
+        title = '<i class="fas fa-exclamation-circle"></i> SIP HABIS';
+        url = 'notifSIP.php?type=expired';
+      } else if (type === 'warning') {
+        title = '<i class="fas fa-clock"></i> SIP ≤ 30 Hari Lagi';
+        url = 'notifSIP.php?type=warning';
+      } else if (type === 'pensiun') {
+        title = '<i class="fas fa-user-clock"></i> Mendekati Pensiun';
+        url = 'notifPensiun.php';
+      } else {
+        title = '<i class="fas fa-check-circle"></i> SIP > 30 Hari Lagi';
+        url = 'notifSIP.php?type=aman';
+      }
+      document.getElementById('notifTitle').innerHTML = title;
+      fetch(url)
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('notifContent').innerHTML = data;
+          $('#notifModal').modal('show');
+        });
+    }
+  </script>
+</div>
+<div class="modal fade" id="notifModal">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header custom-header">
+        <h5 class="modal-title" id="notifTitle">
+          <i class="fas fa-bell"></i> Notifikasi Pegawai
+        </h5>
+        <button type="button" class="close-btn" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" id="notifContent">
+        Loading...
+      </div>
+    </div>
+  </div>
+</div>
+<?php require_once($base_path . 'layout/footer.php'); ?>
