@@ -8,9 +8,9 @@ $where = "";
 if ($type == 'expired') {
   $where = "DATEDIFF(masa_berlaku, CURDATE()) < 0";
 } elseif ($type == 'warning') {
-  $where = "DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 30";
+  $where = "DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 180";
 } elseif ($type == 'aman') {
-  $where = "DATEDIFF(masa_berlaku, CURDATE()) > 30";
+  $where = "DATEDIFF(masa_berlaku, CURDATE()) > 180";
 }
 
 $query = "
@@ -173,7 +173,7 @@ $result = $koneksi->query($query);
             <td>
               <?php if ($row['sisa_hari'] < 0): ?>
                 <span class="badge-mini badge-red">Expired</span>
-              <?php elseif ($row['sisa_hari'] <= 30): ?>
+              <?php elseif ($row['sisa_hari'] <= 180): ?>
                 <span class="badge-mini badge-yellow">
                   <?= $row['sisa_hari']; ?> hari
                 </span>

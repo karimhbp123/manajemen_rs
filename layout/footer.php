@@ -63,12 +63,6 @@
   margin: 0 8px;
 }
 
-/* hover subtle */
-.footer-modern:hover {
-  box-shadow: 0 -12px 35px rgba(0, 0, 0, 0.12);
-  transform: translateY(-1px);
-}
-
 /* responsive */
 @media (max-width: 576px) {
   .footer-content {

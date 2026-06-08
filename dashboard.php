@@ -17,8 +17,8 @@ require_once($base_path . 'config/db.php');
 $queryNotif = "
 SELECT 
   SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) < 0 THEN 1 ELSE 0 END) as expired,
-  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 30 THEN 1 ELSE 0 END) as warning,
-  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) > 30 THEN 1 ELSE 0 END) as aman
+  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 180 THEN 1 ELSE 0 END) as warning,
+  SUM(CASE WHEN DATEDIFF(masa_berlaku, CURDATE()) > 180 THEN 1 ELSE 0 END) as aman
 FROM (
     SELECT masa_berlaku FROM pegawai_pns
     UNION ALL
@@ -85,7 +85,7 @@ FROM (
 ) AS semua_pegawai
 WHERE masa_berlaku IS NOT NULL
 AND masa_berlaku != '0000-00-00'
-AND DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 30
+AND DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 180
 ORDER BY masa_berlaku ASC
 LIMIT 5
 ";
@@ -982,8 +982,8 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
           $totalNotif = $expired + $warning + $aman;
           echo cardNotif('primary', $pensiun, 'PENSIUN', 'fa-user-clock', "onclick=\"loadNotif('pensiun')\"", $totalPegawai);
           echo cardNotif('danger', $expired, 'SIP HABIS', 'fa-exclamation-triangle', "onclick=\"loadNotif('expired')\"", $totalNotif);
-          echo cardNotif('warning', $warning, 'SIP ≤ 30 HARI', 'fa-clock', "onclick=\"loadNotif('warning')\"", $totalNotif);
-          echo cardNotif('success', $aman, 'SIP > 30 HARI', 'fa-check-circle', "onclick=\"loadNotif('aman')\"", $totalNotif);
+          echo cardNotif('warning', $warning, 'SIP ≤ 6 Bulan', 'fa-clock', "onclick=\"loadNotif('warning')\"", $totalNotif);
+          echo cardNotif('success', $aman, 'SIP > 6 Bulan', 'fa-check-circle', "onclick=\"loadNotif('aman')\"", $totalNotif);
           ?>
         </div>
       </div>
@@ -1038,13 +1038,13 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
         title = '<i class="fas fa-exclamation-circle"></i> SIP HABIS';
         url = 'notifSIP.php?type=expired';
       } else if (type === 'warning') {
-        title = '<i class="fas fa-clock"></i> SIP ≤ 30 Hari Lagi';
+        title = '<i class="fas fa-clock"></i> SIP Kurang Dari 6 Bulan';
         url = 'notifSIP.php?type=warning';
       } else if (type === 'pensiun') {
         title = '<i class="fas fa-user-clock"></i> Mendekati Pensiun';
         url = 'notifPensiun.php';
       } else {
-        title = '<i class="fas fa-check-circle"></i> SIP > 30 Hari Lagi';
+        title = '<i class="fas fa-check-circle"></i> SIP > 6 Bulan';
         url = 'notifSIP.php?type=aman';
       }
       document.getElementById('notifTitle').innerHTML = title;
