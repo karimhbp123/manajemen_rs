@@ -52,6 +52,7 @@ $masa_berlaku = $_POST['masa_berlaku'] ?? '';
 $sip = $_POST['sip'] ?? '';
 $status_pegawai = $_POST['status_pegawai'] ?? '';
 $tmt_status = $_POST['tmt_status'] ?? '';
+$status_kepegawaian = 'PEGAWAI NEGERI SIPIL';
 
 // validasi
 if ($nama == '') {
@@ -70,7 +71,7 @@ $query = "INSERT INTO pegawai_pns (
     gol_terakhir, tmt_gol_terakhir, kp,
     rencana_kgb_2024, rencana_kgb_2025, rencana_kgb_2026,
     pendidikan_terakhir, program_studi_pendidikan, universitas, tahun_pendidikan,
-    diklat, str_no, tgl_str, masa_berlaku, sip, status_pegawai, tmt_status
+    diklat, str_no, tgl_str, masa_berlaku, sip, status_pegawai, tmt_status, status_kepegawaian
 ) VALUES (
     '$nama', '$nip', '$nik', '$npwp', '$jenis_kelamin', '$agama',
     '$tempat_lahir', '$tgl_lahir', '$status_perkawinan',
@@ -81,7 +82,7 @@ $query = "INSERT INTO pegawai_pns (
     '$gol_terakhir', '$tmt_gol_terakhir', '$kp',
     '$rencana_kgb_2024', '$rencana_kgb_2025', '$rencana_kgb_2026',
     '$pendidikan_terakhir', '$program_studi', '$universitas', '$tahun_pendidikan',
-    '$diklat', '$str_no', '$tgl_str', '$masa_berlaku', '$sip', '$status_pegawai', '$tmt_status'
+    '$diklat', '$str_no', '$tgl_str', '$masa_berlaku', '$sip', '$status_pegawai', '$tmt_status', '$status_kepegawaian'
 )";
 
 if ($koneksi->query($query)) {

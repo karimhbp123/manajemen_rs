@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gol_terakhir=?, tmt_gol_terakhir=?, kp=?,
             rencana_kgb_2024=?, rencana_kgb_2025=?, rencana_kgb_2026=?,
             pendidikan_terakhir=?, program_studi_pendidikan=?, universitas=?, tahun_pendidikan=?, diklat=?,
-            str_no=?, tgl_str=?, masa_berlaku=?, sip=?, status_pegawai=?, tmt_status=?
+            str_no=?, tgl_str=?, masa_berlaku=?, sip=?, status_pegawai=?, tmt_status=?, status_kepegawaian=?
         WHERE id=?
     ");
 
@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         val('sip'),
         val('status_pegawai'),
         val('tmt_status'),
+        val('status_kepegawaian'),
         $id
     ];
 

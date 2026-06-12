@@ -189,10 +189,6 @@ $tahun_lahir = $lahir->format('Y');
             <span class="value"><?= $data['program_studi']; ?></span>
         </div>
         <div class="item">
-            <span class="label">Ijazah Terakhir</span>
-            <span class="value"><?= $data['ijazah_terakhir']; ?></span>
-        </div>
-        <div class="item">
             <span class="label">Status Kepegawaian</span>
             <span class="value"><?= $data['status_kepegawaian']; ?></span>
         </div>

@@ -346,7 +346,15 @@ $data = $result->fetch_assoc();
             <div class="sub-card">
               <div class="section-title">Keluarga</div>
               <div class="row">
-                <div><label>Status Perkawinan</label><input type="text" name="status_perkawinan" class="form-control" value="<?= $data['status_perkawinan']; ?>"></div>
+                <div>
+                  <label>Status Perkawinan</label>
+                  <select name="status_perkawinan" class="form-control">
+                    <option value="Belum Menikah" <?= $data['status_perkawinan'] == 'Belum Menikah' ? 'selected' : ''; ?>>Belum Menikah</option>
+                    <option value="Menikah" <?= $data['status_perkawinan'] == 'Menikah' ? 'selected' : ''; ?>>Menikah</option>
+                    <option value="Cerai Hidup" <?= $data['status_perkawinan'] == 'Cerai Hidup' ? 'selected' : ''; ?>>Cerai Hidup</option>
+                    <option value="Cerai Mati" <?= $data['status_perkawinan'] == 'Cerai Mati' ? 'selected' : ''; ?>>Cerai Mati</option>
+                  </select>
+                </div>
                 <div><label>Nama Suami/Istri</label><input type="text" name="nama_suami_istri" class="form-control" value="<?= $data['nama_suami_istri']; ?>"></div>
                 <div class="col-md-12"><label>Nama Anak</label><textarea name="nama_anak" class="form-control"><?= $data['nama_anak']; ?></textarea></div>
                 <div><label>No Akte Nikah</label><input type="text" name="no_akte" class="form-control" value="<?= $data['no_akte']; ?>"></div>
@@ -385,7 +393,20 @@ $data = $result->fetch_assoc();
             <div class="sub-card">
               <div class="section-title">Pendidikan</div>
               <div class="row">
-                <div><label>Pendidikan</label><input type="text" name="pendidikan_terakhir" class="form-control" value="<?= $data['pendidikan_terakhir']; ?>"></div>
+                <div>
+                  <label>Pendidikan</label>
+                  <select name="pendidikan_terakhir" class="form-control">
+                    <option value="">-- Pilih Pendidikan --</option>
+                    <option value="SLTA/SMA/SMK" <?= ($data['pendidikan_terakhir'] == 'SLTA/SMA/SMK') ? 'selected' : ''; ?>>SLTA/SMA/SMK</option>
+                    <option value="D1" <?= ($data['pendidikan_terakhir'] == 'D1') ? 'selected' : ''; ?>>D1</option>
+                    <option value="D2" <?= ($data['pendidikan_terakhir'] == 'D2') ? 'selected' : ''; ?>>D2</option>
+                    <option value="D3" <?= ($data['pendidikan_terakhir'] == 'D3') ? 'selected' : ''; ?>>D3</option>
+                    <option value="D4" <?= ($data['pendidikan_terakhir'] == 'D4') ? 'selected' : ''; ?>>D4</option>
+                    <option value="S1" <?= ($data['pendidikan_terakhir'] == 'S1') ? 'selected' : ''; ?>>S1</option>
+                    <option value="S2" <?= ($data['pendidikan_terakhir'] == 'S2') ? 'selected' : ''; ?>>S2</option>
+                    <option value="S3" <?= ($data['pendidikan_terakhir'] == 'S3') ? 'selected' : ''; ?>>S3</option>
+                  </select>
+                </div>
                 <div><label>Program Studi</label><input type="text" name="program_studi_pendidikan" class="form-control" value="<?= $data['program_studi_pendidikan']; ?>"></div>
                 <div><label>Universitas</label><input type="text" name="universitas" class="form-control" value="<?= $data['universitas']; ?>"></div>
                 <div><label>Tahun</label><input type="number" name="tahun_pendidikan" class="form-control" value="<?= $data['tahun_pendidikan']; ?>"></div>
@@ -410,6 +431,16 @@ $data = $result->fetch_assoc();
                 <div><label>Golongan</label><input type="text" name="gol_terakhir" class="form-control" value="<?= $data['gol_terakhir']; ?>"></div>
                 <div><label>TMT Golongan</label><input type="date" name="tmt_gol_terakhir" class="form-control" value="<?= $data['tmt_gol_terakhir']; ?>"></div>
                 <div><label>Tanggal KP</label><input type="date" name="kp" class="form-control" value="<?= $data['kp']; ?>"></div>
+                <div>
+                  <label>Status Kepegawaian</label>
+                  <input type="text"
+                    class="form-control"
+                    value="PPPK PENUH WAKTU"
+                    readonly>
+                  <input type="hidden"
+                    name="status_kepegawaian"
+                    value="PPPK PENUH WAKTU">
+                </div>
               </div>
             </div>
 
@@ -437,6 +468,7 @@ $data = $result->fetch_assoc();
   <script>
     const statusSelect = document.getElementById('statusPegawai');
     const tmtWrapper = document.getElementById('tmtStatusWrapper');
+
     function toggleTMT() {
       const val = statusSelect.value;
       if (val === 'AKTIF') {

@@ -25,18 +25,19 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
 
 <style>
     .modal-dialog {
-        max-width: 650px;
+        max-width: 900px;
         margin: auto;
     }
 
     .detail-container {
         display: flex;
-        justify-content: center;
+        gap: 16px;
         align-items: flex-start;
     }
 
     .card-box {
-        width: 100%;
+        flex: 1;
+        min-width: 0;
         overflow: hidden;
         transition: 0.2s;
         height: fit-content;
@@ -47,14 +48,17 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
         box-shadow:
             0 10px 30px rgba(0, 0, 0, 0.05),
             inset 0 1px 0 rgba(255, 255, 255, 0.6);
-        max-width: 600px;
-        width: 100%;
-        margin: 10px auto;
+    }
+
+    @media (max-width: 768px) {
+        .detail-container {
+            flex-direction: column;
+        }
     }
 
     .card-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.1);
     }
 
     .section-title {
@@ -80,13 +84,11 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
     }
 
     .item {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 1px 6px;
-        margin-bottom: 8px;
-        border-radius: 10px;
-        transition: 0.2s;
+        display: grid;
+        margin-bottom: 12px;
+        gap: 12px;
+        align-items: center;
+        grid-template-columns: 35% 65%;
     }
 
     .item:hover {
@@ -96,28 +98,28 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
     /* LABEL */
     .label {
         font-size: 12px;
-        color: #334155;
+        color: #64748b;
         font-weight: 500;
         line-height: 1.4;
-        padding: 9px 12px;
-        width: 150px;
         flex-shrink: 0;
+        width: 120px;
+        padding: 9px 12px;
+        white-space: nowrap;
     }
 
     /* VALUE (INI KUNCI PERBAIKAN) */
     .value {
-        font-size: 14px;
-        font-weight: 600;
-        color: #334155;
         flex: 1;
         min-width: 0;
-        text-align: left;
-        line-height: 1.5;
-        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #1e293b;
+        padding: 10px 14px;
         border-radius: 10px;
         background: #f1f5f9;
         border: 1px solid #e2e8f0;
-        word-break: break-word;
+        word-break: normal;
+        overflow-wrap: anywhere;
     }
 
     .badge {
@@ -150,10 +152,12 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
     }
 </style>
 
+
 <div class="detail-container">
-    <!-- DATA PRIBADI -->
+
+    <!-- IDENTITAS -->
     <div class="card-box">
-        <div class="section-title">👤 Identitas & Kepegawaian</div>
+        <div class="section-title">👤 Identitas Pribadi</div>
 
         <div class="item">
             <span class="label">NIRP</span>
@@ -165,11 +169,10 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
             <span class="value"><?= $data['nik']; ?></span>
         </div>
 
-
         <div class="item">
             <span class="label">Tanggal Lahir</span>
             <span class="value">
-                <?= date('d-m-Y', strtotime($data['tanggal_lahir'])); ?>
+                <?= $data['tempat_lahir']; ?>, <?= date('d-m-Y', strtotime($data['tanggal_lahir'])); ?>
             </span>
         </div>
 
@@ -177,9 +180,23 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
             <span class="label">Usia</span>
             <span class="value">
                 <?= $usia_tahun; ?> Tahun <?= $usia_bulan; ?> Bulan
-                <small>(<?= $tahun_lahir; ?>)</small>
             </span>
         </div>
+
+        <div class="item">
+            <span class="label">Agama</span>
+            <span class="value"><?= $data['agama']; ?></span>
+        </div>
+
+        <div class="item">
+            <span class="label">Status Perkawinan</span>
+            <span class="value"><?= $data['status_perkawinan']; ?></span>
+        </div>
+    </div>
+
+    <!-- KEPEGAWAIAN -->
+    <div class="card-box">
+        <div class="section-title">💼 Kepegawaian & Pendidikan</div>
 
         <div class="item">
             <span class="label">Status Kepegawaian</span>
@@ -201,15 +218,23 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
         </div>
 
         <div class="item">
+            <span class="label">Pendidikan</span>
+            <span class="value"><?= $data['pendidikan']; ?></span>
+        </div>
+
+        <div class="item">
+            <span class="label">Program Studi</span>
+            <span class="value"><?= $data['program_studi']; ?></span>
+        </div>
+
+        <div class="item">
             <span class="label">Masa Berlaku SIP</span>
             <span class="value">
-                <?=
-                (!empty($data['masa_berlaku']) &&
-                    $data['masa_berlaku'] != '0000-00-00')
+                <?= (!empty($data['masa_berlaku']) && $data['masa_berlaku'] != '0000-00-00')
                     ? date('d-m-Y', strtotime($data['masa_berlaku']))
-                    : '-';
-                ?>
+                    : '-'; ?>
             </span>
         </div>
     </div>
+
 </div>

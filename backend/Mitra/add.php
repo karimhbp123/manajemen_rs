@@ -22,6 +22,7 @@ $email           = $_POST['email'];
 $alamat          = $_POST['alamat'];
 $status_pegawai  = $_POST['status_pegawai'];
 $masa_berlaku    = $_POST['masa_berlaku'];
+$status_kepegawaian = 'PEGAWAI MITRA';
 $tmt_status      = $_POST['tmt_status'] ?? null;
 
 // LOGIC: kalau AKTIF → tmt_status NULL
@@ -37,9 +38,9 @@ if ($status_pegawai == 'AKTIF') {
 
 // query insert
 $query = "INSERT INTO pegawai_mitra 
-(nama, tmt, jabatan, jenis_kelamin, unit, no_hp, email, alamat, status_pegawai, masa_berlaku, tmt_status)
+(nama, tmt, jabatan, jenis_kelamin, unit, no_hp, email, alamat, status_pegawai, status_kepegawaian, masa_berlaku, tmt_status)
 VALUES 
-('$nama', '$tmt', '$jabatan', '$jenis_kelamin', '$unit', '$no_hp', '$email', '$alamat', '$status_pegawai', '$masa_berlaku', $tmt_status)";
+('$nama', '$tmt', '$jabatan', '$jenis_kelamin', '$unit', '$no_hp', '$email', '$alamat', '$status_pegawai', '$status_kepegawaian', '$masa_berlaku', $tmt_status)";
 
 if ($koneksi->query($query)) {
     header("Location: ../../pages/Mitra/index.php?msg=add_success");

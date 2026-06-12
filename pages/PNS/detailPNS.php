@@ -291,6 +291,11 @@ if (!empty($data['kp']) && $data['kp'] != '0000-00-00') {
             <span class="label">Eselon</span>
             <span class="value"><?= $data['eselon']; ?></span>
         </div>
+
+        <div class="item">
+            <span class="label">Status Kepegawaian</span>
+            <span class="value"><?= $data['status_kepegawaian']; ?></span>
+        </div>
     </div>
 
     <!-- PENDIDIKAN -->

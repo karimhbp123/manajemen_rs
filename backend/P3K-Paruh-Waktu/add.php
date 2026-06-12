@@ -38,6 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status_pegawai      = val('status_pegawai');
     $tmt_status          = val('tmt_status');
 
+    $tempat_lahir        = val('tempat_lahir');
+    $agama               = val('agama');
+    $status_perkawinan   = val('status_perkawinan');
+    $pendidikan          = val('pendidikan');
+    $program_studi       = val('program_studi');
+
     // validasi sederhana
     if (!$nama || !$jenis_kelamin) {
         header("Location: ../../pages/P3K-Paruh-Waktu/addP3KPR.php?msg=error");
@@ -46,24 +52,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // query insert
     $query = "INSERT INTO pegawai_p3k_paruh_waktu (
-        nama, nik, jenis_kelamin, tanggal_lahir, alamat, nomor_hp, email,
-        nip, status_kepegawaian, tmt_kepegawaian, jabatan, unit, tmt_masuk, masa_berlaku, status_pegawai, tmt_status
-    ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?, ?, ?, ?
-    )";
+    nama, nik, jenis_kelamin, tempat_lahir, agama, status_perkawinan,
+    tanggal_lahir, alamat, nomor_hp, email,
+    pendidikan, program_studi,
+    nip, status_kepegawaian, tmt_kepegawaian,
+    jabatan, unit, tmt_masuk, masa_berlaku,
+    status_pegawai, tmt_status
+) VALUES (
+    ?, ?, ?, ?, ?, ?,
+    ?, ?, ?, ?,
+    ?, ?,
+    ?, ?, ?,
+    ?, ?, ?, ?,
+    ?, ?, ?
+)";
 
     $stmt = $koneksi->prepare($query);
 
     $stmt->bind_param(
-        "ssssssssssssssss",
+        "sssssssssssssssssssss",
         $nama,
         $nik,
         $jenis_kelamin,
+        $tempat_lahir,
+        $agama,
+        $status_perkawinan,
         $tanggal_lahir,
         $alamat,
         $nomor_hp,
         $email,
+        $pendidikan,
+        $program_studi,
         $nip,
         $status_kepegawaian,
         $tmt_kepegawaian,

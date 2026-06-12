@@ -12,6 +12,7 @@ $no_hp = $_POST['no_hp'];
 $email = $_POST['email'];
 $status_pegawai = $_POST['status_pegawai'];
 $masa_berlaku = $_POST['masa_berlaku'];
+$status_kepegawaian = 'PEGAWAI MITRA';
 $tmt_status = $_POST['tmt_status'] ?? null;
 
 // LOGIC: kalau AKTIF → tmt_status NULL
@@ -31,12 +32,13 @@ $stmt = $koneksi->prepare("UPDATE pegawai_mitra SET
   no_hp=?, 
   email=?,
   status_pegawai=?,
+  status_kepegawaian=?,
   masa_berlaku=?,
   tmt_status=?
   WHERE id=?");
 
 $stmt->bind_param(
-  "ssssssssssii",
+  "ssssssssssssi",
   $nama,
   $tmt,
   $jabatan,
@@ -46,6 +48,7 @@ $stmt->bind_param(
   $no_hp,
   $email,
   $status_pegawai,
+  $status_kepegawaian,
   $masa_berlaku,
   $tmt_status,
   $id

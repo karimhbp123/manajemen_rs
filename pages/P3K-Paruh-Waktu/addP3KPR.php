@@ -22,7 +22,7 @@ require_once($base_path . 'config/db.php');
   /*  CARD UTAMA  */
   .card {
     border-radius: 22px;
-    padding: 35px;
+    padding: 22px;
     background: #ffffff;
     box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);
   }
@@ -31,7 +31,7 @@ require_once($base_path . 'config/db.php');
   .subcard-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
+    gap: 18px;
   }
 
   /* tablet */
@@ -52,7 +52,7 @@ require_once($base_path . 'config/db.php');
   .sub-card {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
-    padding: 24px;
+    padding: 20px;
     border: 1px solid rgba(226, 232, 240, 0.7);
     box-shadow:
       0 10px 25px rgba(0, 0, 0, 0.05),
@@ -296,6 +296,37 @@ require_once($base_path . 'config/db.php');
                     <option value="Perempuan">Perempuan</option>
                   </select>
                 </div>
+                <div>
+                  <label>Tempat Lahir</label>
+                  <input type="text"
+                    name="tempat_lahir"
+                    class="form-control"
+                    placeholder="Masukkan Tempat Lahir">
+                </div>
+
+                <div>
+                  <label>Agama</label>
+                  <select name="agama" class="form-control">
+                    <option value="" selected disabled>-- Pilih Agama --</option>
+                    <option value="Islam">Islam</option>
+                    <option value="Kristen">Kristen</option>
+                    <option value="Katolik">Katolik</option>
+                    <option value="Hindu">Hindu</option>
+                    <option value="Buddha">Buddha</option>
+                    <option value="Konghucu">Konghucu</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>Status Perkawinan</label>
+                  <select name="status_perkawinan" class="form-control">
+                    <option value="" selected disabled>-- Pilih Status --</option>
+                    <option value="Belum Menikah">Belum Menikah</option>
+                    <option value="Menikah">Menikah</option>
+                    <option value="Cerai Hidup">Cerai Hidup</option>
+                    <option value="Cerai Mati">Cerai Mati</option>
+                  </select>
+                </div>
                 <div><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir" class="form-control" value=""></div>
                 <div class="col-md-12"><label>Alamat</label><textarea name="alamat" class="form-control" placeholder="Masukkan Alamat"></textarea></div>
                 <div><label>No HP</label><input type="text" name="nomor_hp" class="form-control" value="" placeholder="Masukkan Nomor HP"></div>
@@ -310,7 +341,40 @@ require_once($base_path . 'config/db.php');
                 <div><label>NIRP</label><input type="text" name="nip" class="form-control" value="" placeholder="Masukkan NIRP"></div>
                 <div><label>Jabatan</label><input type="text" name="jabatan" class="form-control" value="" placeholder="Masukkan Jabatan"></div>
                 <div><label>Unit Kerja</label><input type="text" name="unit" class="form-control" value="" placeholder="Masukkan Unit Kerja"></div>
-                <div><label>Status Kepegawaian</label><input type="text" name="status_kepegawaian" class="form-control" value="" placeholder="Masukkan Status Kepegawaian"></div>
+                <div>
+                  <label>Pendidikan</label>
+                  <select name="pendidikan" class="form-control">
+                    <option value="" selected disabled>-- Pilih Pendidikan --</option>
+                    <option value="SD">SD</option>
+                    <option value="SMP">SMP</option>
+                    <option value="SLTA/SMA/SMK">SLTA/SMA/SMK</option>
+                    <option value="D1">D1</option>
+                    <option value="D2">D2</option>
+                    <option value="D3">D3</option>
+                    <option value="D4">D4</option>
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>Program Studi</label>
+                  <input type="text"
+                    name="program_studi"
+                    class="form-control"
+                    placeholder="Masukkan Program Studi">
+                </div>
+                <div>
+                  <label>Status Kepegawaian</label>
+                  <input type="text"
+                    class="form-control"
+                    value="PPPK PARUH WAKTU"
+                    readonly>
+                  <input type="hidden"
+                    name="status_kepegawaian"
+                    value="PPPK PARUH WAKTU">
+                </div>
                 <div><label>TMT Kepegawaian</label><input type="date" name="tmt_kepegawaian" class="form-control" value=""></div>
                 <div><label>TMT Masuk</label><input type="date" name="tmt_masuk" class="form-control" value=""></div>
                 <div>

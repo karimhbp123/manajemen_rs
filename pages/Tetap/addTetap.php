@@ -352,15 +352,20 @@ require_once($base_path . 'config/db.php');
                                 </div>
 
                                 <div><label>Pendidikan</label>
-                                    <input type="text" name="pendidikan" class="form-control" placeholder="Masukkan Pendidikan">
+                                    <select name="pendidikan" class="form-control">
+                                        <option value="">-- Pilih Pendidikan --</option>
+                                        <option value="D1">D1</option>
+                                        <option value="D2">D2</option>
+                                        <option value="D3">D3</option>
+                                        <option value="D4">D4</option>
+                                        <option value="S1">S1</option>
+                                        <option value="S2">S2</option>
+                                        <option value="S3">S3</option>
+                                    </select>
                                 </div>
 
                                 <div><label>Program Studi</label>
                                     <input type="text" name="program_studi" class="form-control" placeholder="Masukkan Program Studi">
-                                </div>
-
-                                <div><label>Ijazah Terakhir</label>
-                                    <input type="text" name="ijazah_terakhir" class="form-control" placeholder="Masukkan Ijazah Terakhir">
                                 </div>
 
                                 <div><label>Jabatan</label>
@@ -370,9 +375,15 @@ require_once($base_path . 'config/db.php');
                                 <div><label>Unit Kerja</label>
                                     <input type="text" name="unit" class="form-control" placeholder="Masukkan Unit Kerja">
                                 </div>
-
-                                <div><label>Status Kepegawaian</label>
-                                    <input type="text" name="status_kepegawaian" class="form-control" placeholder="Masukkan Status Kepegawaian">
+                                <div>
+                                    <label>Status Kepegawaian</label>
+                                    <input type="text"
+                                        class="form-control"
+                                        value="PEGAWAI TETAP"
+                                        readonly>
+                                    <input type="hidden"
+                                        name="status_kepegawaian"
+                                        value="PEGAWAI TETAP">
                                 </div>
 
                                 <div><label>TMT Masuk</label>

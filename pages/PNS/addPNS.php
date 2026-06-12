@@ -323,7 +323,16 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
             <div class="sub-card">
               <div class="section-title">Keluarga</div>
               <div class="row">
-                <div><label>Status Perkawinan</label><input type="text" name="status_perkawinan" class="form-control" placeholder="Masukkan status perkawinan"></div>
+                <div>
+                  <label>Status Perkawinan</label>
+                  <select name="status_perkawinan" class="form-control">
+                    <option value="" selected disabled>-- Pilih Status --</option>
+                    <option value="Belum Menikah">Belum Menikah</option>
+                    <option value="Menikah">Menikah</option>
+                    <option value="Cerai Hidup">Cerai Hidup</option>
+                    <option value="Cerai Mati">Cerai Mati</option>
+                  </select>
+                </div>
                 <div><label>Nama Suami/Istri</label><input type="text" name="nama_suami_istri" class="form-control" placeholder="Masukkan suami/istri"></div>
                 <div class="col-md-12"><label>Nama Anak</label><textarea name="nama_anak" class="form-control" placeholder="Masukkan nama anak"></textarea></div>
                 <div><label>No Akta Nikah</label><input type="text" name="no_akte" class="form-control" placeholder="Masukkan no akta nikah"></div>
@@ -363,7 +372,18 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
             <div class="sub-card">
               <div class="section-title">Pendidikan</div>
               <div class="row">
-                <div><label>Pendidikan</label><input type="text" name="pendidikan_terakhir" class="form-control" placeholder="Masukkan pendidikan terakhir"></div>
+                <div><label>Pendidikan</label>
+                  <select name="pendidikan_terakhir" class="form-control">
+                    <option value="">-- Pilih Pendidikan --</option>
+                    <option value="D1">D1</option>
+                    <option value="D2">D2</option>
+                    <option value="D3">D3</option>
+                    <option value="D4">D4</option>
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                  </select>
+                </div>
                 <div><label>Program Studi</label><input type="text" name="program_studi_pendidikan" class="form-control" placeholder="Masukkan program studi pendidikan"></div>
                 <div><label>Universitas</label><input type="text" name="universitas" class="form-control" placeholder="Masukkan nama universitas"></div>
                 <div><label>Tahun</label><input type="number" name="tahun_pendidikan" class="form-control" placeholder="Masukkan tahun pendidikan"></div>
@@ -388,6 +408,16 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                 <div><label>Golongan</label><input type="text" name="gol_terakhir" class="form-control" placeholder="Masukkan Golongan"></div>
                 <div><label>TMT Golongan</label><input type="date" name="tmt_gol_terakhir" class="form-control"></div>
                 <div><label>Tanggal KP</label><input type="date" name="kp" class="form-control"></div>
+                <div>
+                  <label>Status Kepegawaian</label>
+                  <input type="text"
+                    class="form-control"
+                    value="PEGAWAII NEGERI SIPIL"
+                    readonly>
+                  <input type="hidden"
+                    name="status_kepegawaian"
+                    value="PEGAWAII NEGERI SIPIL">
+                </div>
               </div>
             </div>
 

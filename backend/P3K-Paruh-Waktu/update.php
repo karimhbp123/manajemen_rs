@@ -13,18 +13,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     function val($key)
     {
-        return isset($_POST[$key]) && $_POST[$key] !== '' ? $_POST[$key] : null;
+        return isset($_POST[$key]) && $_POST[$key] !== ''
+            ? htmlspecialchars(trim($_POST[$key]))
+            : null;
     }
+
+    $nama              = val('nama');
+    $nik               = val('nik');
+    $jenis_kelamin     = val('jenis_kelamin');
+    $tempat_lahir      = val('tempat_lahir');
+    $agama             = val('agama');
+    $status_perkawinan = val('status_perkawinan');
+    $tanggal_lahir     = val('tanggal_lahir');
+    $alamat            = val('alamat');
+    $nomor_hp          = val('nomor_hp');
+    $email             = val('email');
+
+    $pendidikan        = val('pendidikan');
+    $program_studi     = val('program_studi');
+
+    $nip               = val('nip');
+    $status_kepegawaian = val('status_kepegawaian');
+    $tmt_kepegawaian   = val('tmt_kepegawaian');
+    $jabatan           = val('jabatan');
+    $unit              = val('unit');
+    $tmt_masuk         = val('tmt_masuk');
+    $masa_berlaku      = val('masa_berlaku');
+    $status_pegawai    = val('status_pegawai');
+    $tmt_status        = val('tmt_status');
 
     $stmt = $koneksi->prepare("
         UPDATE pegawai_p3k_paruh_waktu SET
             nama=?,
             nik=?,
             jenis_kelamin=?,
+            tempat_lahir=?,
+            agama=?,
+            status_perkawinan=?,
             tanggal_lahir=?,
             alamat=?,
             nomor_hp=?,
             email=?,
+            pendidikan=?,
+            program_studi=?,
             nip=?,
             status_kepegawaian=?,
             tmt_kepegawaian=?,
@@ -37,29 +68,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE id=?
     ");
 
-    $params = [
-        val('nama'),
-        val('nik'),
-        val('jenis_kelamin'),
-        val('tanggal_lahir'),
-        val('alamat'),
-        val('nomor_hp'),
-        val('email'),
-        val('nip'),
-        val('status_kepegawaian'),
-        val('tmt_kepegawaian'),
-        val('jabatan'),
-        val('unit'),
-        val('tmt_masuk'),
-        val('masa_berlaku'),
-        val('status_pegawai'),
-        val('tmt_status'),
+    $stmt->bind_param(
+        "ssssssssssssssssssssi",
+        $nama,
+        $nik,
+        $jenis_kelamin,
+        $tempat_lahir,
+        $agama,
+        $status_perkawinan,
+        $tanggal_lahir,
+        $alamat,
+        $nomor_hp,
+        $email,
+        $pendidikan,
+        $program_studi,
+        $nip,
+        $status_kepegawaian,
+        $tmt_kepegawaian,
+        $jabatan,
+        $unit,
+        $tmt_masuk,
+        $masa_berlaku,
+        $status_pegawai,
+        $tmt_status,
         $id
-    ];
-
-    $types = str_repeat("s", count($params) - 1) . "i";
-
-    $stmt->bind_param($types, ...$params);
+    );
 
     if ($stmt->execute()) {
         header("Location: ../../pages/P3K-Paruh-Waktu/index.php?msg=update_success");

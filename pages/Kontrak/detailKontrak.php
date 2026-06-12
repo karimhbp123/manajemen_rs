@@ -71,11 +71,6 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
         box-shadow: 0 18px 35px rgba(0, 0, 0, 0.1);
     }
 
-    .card-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-    }
-
     .section-title {
         display: flex;
         align-items: center;
@@ -212,11 +207,6 @@ if (!empty($data['tmt_kepegawaian']) && $data['tmt_kepegawaian'] != '0000-00-00'
         <div class="item">
             <span class="label">Program Studi</span>
             <span class="value"><?= $data['program_studi']; ?></span>
-        </div>
-
-        <div class="item">
-            <span class="label">Ijazah Terakhir</span>
-            <span class="value"><?= $data['ijazah_terakhir']; ?></span>
         </div>
 
         <div class="item">

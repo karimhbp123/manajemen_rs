@@ -321,6 +321,16 @@ $data = $result->fetch_assoc();
                             <div class="row">
                                 <div><label>Jabatan</label><input type="text" name="jabatan" class="form-control" value="<?= $data['jabatan']; ?>"></div>
                                 <div><label>Unit Kerja</label><input type="text" name="unit" class="form-control" value="<?= $data['unit']; ?>"></div>
+                                <div>
+                                    <label>Status Kepegawaian</label>
+                                    <input type="text"
+                                        class="form-control"
+                                        value="PEGAWAI MITRA"
+                                        readonly>
+                                    <input type="hidden"
+                                        name="status_kepegawaian"
+                                        value="PEGAWAI MITRA">
+                                </div>
                                 <div><label>TMT Masuk</label><input type="date" name="tmt" class="form-control" value="<?= $data['tmt']; ?>"></div>
                                 <div><label>Masa Berlaku SIP</label><input type="date" name="masa_berlaku" class="form-control" value="<?= $data['masa_berlaku'] ?? ''; ?>"></div>
                                 <div>

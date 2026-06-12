@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nip                = val('nip');
     $pendidikan          = val('pendidikan'); // ✅ baru
     $program_studi       = val('program_studi'); // ✅ baru
-    $ijazah_terakhir     = val('ijazah_terakhir'); // ✅ baru
     $jabatan             = val('jabatan');
     $unit                = val('unit');
     $status_kepegawaian  = val('status_kepegawaian');
@@ -49,14 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = "INSERT INTO pegawai_tetap (
         nama, nik, jenis_kelamin, tempat_lahir, tanggal_lahir, agama,
         alamat, nomor_hp, email,
-        nip, pendidikan, program_studi, ijazah_terakhir,
+        nip, pendidikan, program_studi,
         jabatan, unit, status_kepegawaian, tmt_masuk, masa_berlaku, status_pegawai, tmt_status
     ) VALUES (
     ?, ?, ?, ?, ?, 
     ?, ?, ?, 
     ?, ?, ?, ?, 
     ?, ?, ?, 
-    ?, ?, ?, ?, ?
+    ?, ?, ?, ?,
     )";
 
     $stmt = $koneksi->prepare($query);
@@ -66,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $stmt->bind_param(
-        "ssssssssssssssssssss",
+        "sssssssssssssssssss",
         $nama,
         $nik,
         $jenis_kelamin,
@@ -79,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nip,
         $pendidikan,
         $program_studi,
-        $ijazah_terakhir,
         $jabatan,
         $unit,
         $status_kepegawaian,

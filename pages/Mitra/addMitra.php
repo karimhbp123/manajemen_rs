@@ -326,6 +326,17 @@ require_once($base_path . 'config/db.php');
                                     <input type="text" name="unit" class="form-control" placeholder="Masukkan Unit Kerja">
                                 </div>
 
+                                <div>
+                                    <label>Status Kepegawaian</label>
+                                    <input type="text"
+                                        class="form-control"
+                                        value="PEGAWAI MITRA"
+                                        readonly>
+                                    <input type="hidden"
+                                        name="status_kepegawaian"
+                                        value="PEGAWAI MITRA">
+                                </div>
+
                                 <div><label>TMT Masuk</label>
                                     <input type="date" name="tmt" class="form-control">
                                 </div>
@@ -361,6 +372,7 @@ require_once($base_path . 'config/db.php');
     <script>
         const statusSelect = document.getElementById('statusPegawai');
         const tmtWrapper = document.getElementById('tmtStatusWrapper');
+
         function toggleTMT() {
             const val = statusSelect.value;
             if (val === '' || val === 'AKTIF') {
