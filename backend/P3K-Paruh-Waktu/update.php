@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ");
 
     $stmt->bind_param(
-        "ssssssssssssssssssssi",
+        "sssssssssssssssssssssi",
         $nama,
         $nik,
         $jenis_kelamin,
