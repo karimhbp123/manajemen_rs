@@ -50,48 +50,6 @@ if ($resultNotif && $resultNotif->num_rows > 0) {
   $aman = 0;
 }
 
-
-$querySoon = "
-SELECT nama, masa_berlaku, jenis
-FROM (
-    SELECT nama, masa_berlaku, 'PNS' as jenis 
-    FROM pegawai_pns
-
-    UNION ALL
-
-    SELECT nama, masa_berlaku, 'P3K Penuh Waktu' as jenis 
-    FROM pegawai_p3k_penuh_waktu
-
-    UNION ALL
-
-    SELECT nama, masa_berlaku, 'P3K Paruh Waktu' as jenis 
-    FROM pegawai_p3k_paruh_waktu
-
-    UNION ALL
-
-    SELECT nama, masa_berlaku, 'Kontrak' as jenis 
-    FROM pegawai_kontrak
-
-    UNION ALL
-
-    SELECT nama, masa_berlaku, 'Tetap' as jenis 
-    FROM pegawai_tetap
-
-    UNION ALL
-
-    SELECT nama, masa_berlaku, 'Mitra' as jenis 
-    FROM pegawai_mitra
-
-) AS semua_pegawai
-WHERE masa_berlaku IS NOT NULL
-AND masa_berlaku != '0000-00-00'
-AND DATEDIFF(masa_berlaku, CURDATE()) BETWEEN 0 AND 180
-ORDER BY masa_berlaku ASC
-LIMIT 5
-";
-
-$resultSoon = $koneksi->query($querySoon);
-
 // QUERY TOTAL PEGAWAI (SEMUA TABEL)
 $queryTotal = "
 SELECT 
@@ -203,11 +161,117 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
 } else {
   $pensiun = 0;
 }
+
+$queryPendidikan = "
+SELECT pendidikan,
+       SUM(pns) pns,
+       SUM(p3k_full) p3k_full,
+       SUM(p3k_part) p3k_part,
+       SUM(tetap) tetap,
+       SUM(kontrak) kontrak,
+       SUM(total) total
+FROM (
+
+    SELECT
+        pendidikan_terakhir AS pendidikan,
+        COUNT(*) pns,
+        0 p3k_full,
+        0 p3k_part,
+        0 tetap,
+        0 kontrak,
+        COUNT(*) total
+    FROM pegawai_pns
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+    GROUP BY pendidikan_terakhir
+
+    UNION ALL
+
+    SELECT
+        pendidikan_terakhir,
+        0,
+        COUNT(*),
+        0,
+        0,
+        0,
+        COUNT(*)
+    FROM pegawai_p3k_penuh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+    GROUP BY pendidikan_terakhir
+
+    UNION ALL
+
+    SELECT
+        pendidikan,
+        0,
+        0,
+        COUNT(*),
+        0,
+        0,
+        COUNT(*)
+    FROM pegawai_p3k_paruh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+    GROUP BY pendidikan
+
+    UNION ALL
+
+    SELECT
+        pendidikan,
+        0,
+        0,
+        0,
+        COUNT(*),
+        0,
+        COUNT(*)
+    FROM pegawai_tetap
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+    GROUP BY pendidikan
+
+    UNION ALL
+
+    SELECT
+        pendidikan,
+        0,
+        0,
+        0,
+        0,
+        COUNT(*),
+        COUNT(*)
+    FROM pegawai_kontrak
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+    GROUP BY pendidikan
+
+) x
+WHERE pendidikan IS NOT NULL
+AND pendidikan <> ''
+GROUP BY pendidikan
+ORDER BY FIELD(
+    pendidikan,
+    'SLTA/SMA/SMK',
+    'D1',
+    'D2',
+    'D3',
+    'D4',
+    'S1',
+    'S2',
+    'S3'
+)
+";
+
+$resultPendidikan = $koneksi->query($queryPendidikan);
+
+$pendidikanData = [];
+
+while ($row = $resultPendidikan->fetch_assoc()) {
+
+  $pendidikanData[] = $row;
+
+  $chartLabel[] = $row['pendidikan'];
+  $chartData[] = (int)$row['total'];
+}
 ?>
 
 <?php require_once($base_path . 'layout/header.php'); ?>
 <?php require_once($base_path . 'layout/sidebar.php'); ?>
-<?php require_once($base_path . 'config/db.php'); ?>
 
 <style>
   /* GLOBAL LAYOUT */
@@ -215,6 +279,13 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
   body {
     height: 100%;
     overflow-x: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   .content-wrapper {
@@ -226,6 +297,14 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
   .content {
     flex: 1;
     overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  /* Chrome, Edge, Safari */
+  .content::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
   }
 
   /* NOTIF CARD - MODERN PREMIUM */
@@ -861,64 +940,130 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
     margin-top: 10px;
   }
 
-  .medis-highlight {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 22px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #ffffff, #f8fafc);
-    border: 1px solid #e5e7eb;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  .pendidikan-wrapper {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, .08);
   }
 
-  .medis-highlight:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  /* =========================
+   TABLE PENDIDIKAN PREMIUM
+========================= */
+
+  .table-pendidikan {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .06);
+    font-size: 12px;
+    border-radius: 14px;
   }
 
-  /* kiri */
-  .medis-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  .table-pendidikan th:first-child,
+  .table-pendidikan td:first-child {
+    width: 20%;
   }
 
-  .medis-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+  .table-pendidikan th:not(:first-child),
+  .table-pendidikan td:not(:first-child) {
+    width: 20%;
+  }
+
+  /* HEADER */
+  .table-pendidikan thead th {
     background: linear-gradient(135deg, #4f46e5, #06b6d4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 18px;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    white-space: nowrap;
+    border-right: 1px solid rgba(255, 255, 255, .2);
+    padding: 8px 6px;
+    font-size: 12px;
   }
 
-  /* text */
-  .medis-text {
-    display: flex;
-    flex-direction: column;
+  /* BODY */
+  .table-pendidikan tbody td {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 600;
+    color: #374151;
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px 6px;
+    font-size: 12px;
   }
 
-  .medis-label {
-    font-size: 14px;
+  /* PENDIDIKAN */
+  .table-pendidikan tbody td:first-child {
+    text-align: left;
+    padding-left: 20px;
     font-weight: 700;
     color: #111827;
   }
 
-  .medis-sub {
-    font-size: 12px;
-    color: #6b7280;
+  .table-pendidikan th,
+  .table-pendidikan td {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 
-  /* kanan (angka besar) */
-  .medis-right {
-    font-size: 36px;
+  /* ZEBRA */
+  .table-pendidikan tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  .table-pendidikan tbody tr:nth-child(odd) {
+    background: #ffffff;
+  }
+
+  /* HOVER */
+  .table-pendidikan tbody tr {
+    transition: all .25s ease;
+  }
+
+  .table-pendidikan tbody tr:hover {
+    background: #eef2ff;
+    transform: scale(1.003);
+  }
+
+  /* ANGKA */
+  .table-pendidikan tbody td:not(:first-child) {
+    font-weight: 700;
+  }
+
+  /* TOTAL BADGE */
+  .badge-total {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
     font-weight: 800;
-    color: #4f46e5;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, .25);
+    min-width: 38px;
+    height: 26px;
+    font-size: 11px;
+    padding: 0 8px;
+  }
+
+
+  /* RESPONSIVE */
+  .badge-pendidikan {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
   }
 </style>
 
@@ -947,9 +1092,7 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
           <h5>Monitoring Status Pegawai</h5>
           <span>Notifikasi masa berlaku SIP, tahun lulus, dan data penting lainnya</span>
         </div>
-        <!-- SUMMARY CARD (PREMIUM GRID) -->
         <div class="notif-grid">
-          <!-- CARD -->
           <?php
           function cardNotif($class, $num, $label, $icon, $onclick = '', $total = 100)
           {
@@ -1028,8 +1171,53 @@ if ($resultPensiun && $resultPensiun->num_rows > 0) {
           echo cardJenis('Pegawai Mitra', $jmlMitra, 'fa-handshake-angle', 'mitra', $totalPegawai, 'pages/Mitra');          ?>
         </div>
       </div>
+      <div class="pendidikan-wrapper">
+
+        <div class="jenis-header mb-2">
+          <h5>Detail Pendidikan Pegawai</h5>
+          <span>Rincian per jenis kepegawaian</span>
+        </div>
+
+        <div>
+          <table class="table table-bordered table-hover table-pendidikan">
+            <thead>
+              <tr>
+                <th>Pendidikan</th>
+                <th>PNS</th>
+                <th>PPPK PENUH WAKTU</th>
+                <th>PPPK PARUH WAKTU</th>
+                <th>Tetap</th>
+                <th>Kontrak</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <?php foreach ($pendidikanData as $row): ?>
+                <tr>
+                  <td>
+                    <strong><?= $row['pendidikan'] ?></strong>
+                  </td>
+                  <td><?= $row['pns'] ?></td>
+                  <td><?= $row['p3k_full'] ?></td>
+                  <td><?= $row['p3k_part'] ?></td>
+                  <td><?= $row['tetap'] ?></td>
+                  <td><?= $row['kontrak'] ?></td>
+                  <td>
+                    <span class="badge-total">
+                      <?= $row['total'] ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
+
+
   <script>
     function loadNotif(type) {
       let title = '';

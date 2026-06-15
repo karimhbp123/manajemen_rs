@@ -350,6 +350,7 @@ require_once($base_path . 'config/db.php');
                                 <div><label>Pendidikan</label>
                                     <select name="pendidikan" class="form-control">
                                         <option value="">-- Pilih Pendidikan --</option>
+                                        <option value="SLTA/SMA/SMK">SLTA/SMA/SMK</option>
                                         <option value="D1">D1</option>
                                         <option value="D2">D2</option>
                                         <option value="D3">D3</option>

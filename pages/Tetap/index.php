@@ -871,7 +871,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
           <i class="fas fa-plus"></i>
           <span>Tambah</span>
         </a>
-        <a href="https://docs.google.com/spreadsheets/d/1exAYQ4Aw0J0tPYciiqDzsjKfm5T_rWRQ1qqgKvJaNi0/edit?gid=1712724715#gid=1712724715"
+        <a href="../../export_pegawai.php?jenis=tetap"
           class="btn-modern success"
           target="_blank"
           rel="noopener noreferrer">

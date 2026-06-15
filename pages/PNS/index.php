@@ -904,7 +904,7 @@ $aman    = $dataNotif['aman'] ?? 0;
           <i class="fas fa-plus"></i>
           <span>Tambah</span>
         </a>
-        <a href="https://docs.google.com/spreadsheets/d/1exAYQ4Aw0J0tPYciiqDzsjKfm5T_rWRQ1qqgKvJaNi0/edit?gid=1738744082#gid=1738744082"
+        <a href="../../export_pegawai.php?jenis=pns"
           class="btn-modern success"
           target="_blank"
           rel="noopener noreferrer">

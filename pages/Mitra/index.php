@@ -729,7 +729,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
           <i class="fas fa-plus"></i>
           <span>Tambah</span>
         </a>
-        <a href="https://docs.google.com/spreadsheets/d/1exAYQ4Aw0J0tPYciiqDzsjKfm5T_rWRQ1qqgKvJaNi0/edit?gid=616494788#gid=616494788"
+        <a href="../../export_pegawai.php?jenis=mitra"
           class="btn-modern success"
           target="_blank"
           rel="noopener noreferrer">
@@ -880,7 +880,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                         } else {
                           echo '-';
                         }
-                        ?>  
+                        ?>
                       </td>
                       <td class="col-aksi text-center">
                         <div class="action-group">
@@ -974,6 +974,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
 
     //filter status
     const filterStatus = document.getElementById('filterStatus');
+
     function filterTable() {
       const keyword = searchInput.value.toLowerCase();
       const statusFilter = filterStatus.value.toUpperCase();

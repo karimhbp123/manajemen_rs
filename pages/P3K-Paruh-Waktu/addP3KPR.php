@@ -345,8 +345,6 @@ require_once($base_path . 'config/db.php');
                   <label>Pendidikan</label>
                   <select name="pendidikan" class="form-control">
                     <option value="" selected disabled>-- Pilih Pendidikan --</option>
-                    <option value="SD">SD</option>
-                    <option value="SMP">SMP</option>
                     <option value="SLTA/SMA/SMK">SLTA/SMA/SMK</option>
                     <option value="D1">D1</option>
                     <option value="D2">D2</option>

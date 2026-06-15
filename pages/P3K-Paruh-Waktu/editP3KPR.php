@@ -397,8 +397,6 @@ $data = $result->fetch_assoc();
                   <label>Pendidikan</label>
                   <select name="pendidikan" class="form-control">
                     <option value="">-- Pilih Pendidikan --</option>
-                    <option value="SD" <?= $data['pendidikan'] == 'SD' ? 'selected' : ''; ?>>SD</option>
-                    <option value="SMP" <?= $data['pendidikan'] == 'SMP' ? 'selected' : ''; ?>>SMP</option>
                     <option value="SLTA/SMA/SMK" <?= $data['pendidikan'] == 'SLTA/SMA/SMK' ? 'selected' : ''; ?>>SLTA/SMA/SMK</option>
                     <option value="D1" <?= $data['pendidikan'] == 'D1' ? 'selected' : ''; ?>>D1</option>
                     <option value="D2" <?= $data['pendidikan'] == 'D2' ? 'selected' : ''; ?>>D2</option>
