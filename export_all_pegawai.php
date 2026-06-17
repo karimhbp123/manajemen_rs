@@ -314,7 +314,7 @@ foreach ($config as $key => $cfg) {
         'alignment' => [
             'horizontal' => Alignment::HORIZONTAL_CENTER,
             'vertical' => Alignment::VERTICAL_CENTER,
-            'wrapText' => true
+            'wrapText' => false
         ],
         'fill' => [
             'fillType' => Fill::FILL_SOLID,
@@ -386,7 +386,7 @@ foreach ($config as $key => $cfg) {
     if ($lastRow >= 4) {
         $sheet->getStyle("A4:{$lastCol}{$lastRow}")
             ->getAlignment()
-            ->setWrapText(true)
+            ->setWrapText(false)
             ->setVertical(Alignment::VERTICAL_CENTER);
     }
 

@@ -318,7 +318,7 @@ $sheet->getStyle("A3:{$lastCol}{$lastRow}")
 
 $sheet->getStyle("A4:{$lastCol}{$lastRow}")
     ->getAlignment()
-    ->setWrapText(true);
+    ->setWrapText(false);
 
 /* FREEZE HEADER */
 $sheet->freezePane('A4');
