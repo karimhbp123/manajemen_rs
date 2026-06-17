@@ -316,11 +316,29 @@ $sheet->getStyle("A3:{$lastCol}{$lastRow}")
         ]
     ]);
 
+$sheet->getStyle("A4:{$lastCol}{$lastRow}")
+    ->getAlignment()
+    ->setWrapText(true);
+
+/* FREEZE HEADER */
+$sheet->freezePane('A4');
+$sheet->getDefaultRowDimension()->setRowHeight(-1);
+$sheet->getColumnDimension('I')->setWidth(40); // Alamat
+
+/* FILTER & SORT */
+if ($lastRow >= 4) {
+    $sheet->setAutoFilter("A3:{$lastCol}{$lastRow}");
+}
+
+/* FOKUS KE HEADER */
+$sheet->setSelectedCell('A3');
+
 /* AUTO WIDTH */
 for ($i = 1; $i <= count($headers); $i++) {
     $col = Coordinate::stringFromColumnIndex($i);
     $sheet->getColumnDimension($col)->setAutoSize(true);
 }
+
 
 /* OUTPUT CLEAN */
 if (ob_get_length()) ob_end_clean();
