@@ -956,7 +956,7 @@ $aman    = $dataNotif['aman'] ?? 0;
             </div>
           <?php endif; ?>
           <div class="table-responsive">
-            <table class="table table-hover align-middle text-sm">
+            <table class="table table-bordered table-hover align-middle text-sm">
               <thead id="tableHead">
                 <tr class="thead-full">
                   <th>NO</th>
