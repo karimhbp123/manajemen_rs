@@ -78,7 +78,6 @@ switch ($jenis) {
             'TMT Kepegawaian' => 'tmt_kepegawaian',
             'TMT Masuk' => 'tmt_masuk',
             'Status Pegawai' => 'status_pegawai',
-            'TMT Status' => 'tmt_status',
             'Masa Berlaku SIP' => 'masa_berlaku'
         ];
         break;
@@ -103,7 +102,6 @@ switch ($jenis) {
             'Status Kepegawaian' => 'status_kepegawaian',
             'TMT Masuk' => 'tmt_masuk',
             'Status Pegawai' => 'status_pegawai',
-            'TMT Status' => 'tmt_status',
             'Masa Berlaku SIP' => 'masa_berlaku'
         ];
         break;
@@ -155,7 +153,6 @@ switch ($jenis) {
             'TMT CPNS' => 'tmt_cpns',
             'TMT Jabatan' => 'tmt_jabatan',
             'Status Pegawai' => 'status_pegawai',
-            'TMT Status' => 'tmt_status',
             'Status Kepegawaian' => 'status_kepegawaian',
 
             // STR / SIP
@@ -197,7 +194,6 @@ switch ($jenis) {
             // status waktu
             'TMT Masuk' => 'tmt_masuk',
             'TMT Kepegawaian' => 'tmt_kepegawaian',
-            'TMT Status' => 'tmt_status',
             'Masa Berlaku' => 'masa_berlaku',
         ];
         break;
@@ -213,7 +209,6 @@ switch ($jenis) {
             'Alamat' => 'alamat',
             'No HP' => 'no_hp',
             'Email' => 'email',
-            'Status Pegawai' => 'status_pegawai',
             'Masa Berlaku SIP' => 'masa_berlaku',
             'Status Kepegawaian' => 'status_kepegawaian',
         ];
@@ -236,15 +231,49 @@ $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENT
 
 /* HEADER */
 $col = 1;
+$headerStartRow = 3;
+
 foreach ($headers as $label => $dbKey) {
-    $cell = Coordinate::stringFromColumnIndex($col);
-    $sheet->setCellValue($cell . '3', $label);
+    $cell = Coordinate::stringFromColumnIndex($col) . $headerStartRow;
+
+    $sheet->setCellValue($cell, $label);
+
     $col++;
 }
+
+$headerLastCol = Coordinate::stringFromColumnIndex(count($headers));
+
+/* STYLE HEADER */
+$sheet->getStyle("A3:{$headerLastCol}3")->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 12,
+        'color' => ['rgb' => 'FFFFFF'],
+    ],
+    'alignment' => [
+        'horizontal' => Alignment::HORIZONTAL_CENTER,
+        'vertical' => Alignment::VERTICAL_CENTER,
+        'wrapText' => true
+    ],
+    'fill' => [
+        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+        'startColor' => ['rgb' => '4F46E5']
+    ],
+    'borders' => [
+        'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['rgb' => 'FFFFFF']
+        ]
+    ]
+]);
+
+/* TINGGI BARIS HEADER */
+$sheet->getRowDimension(3)->setRowHeight(28);
 
 /* DATA */
 $rowExcel = 4;
 $no = 1;
+
 
 while ($row = mysqli_fetch_assoc($query)) {
 

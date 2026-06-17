@@ -1065,6 +1065,26 @@ while ($row = $resultPendidikan->fetch_assoc()) {
     font-size: 12px;
     font-weight: 700;
   }
+
+  .btn-modern.success {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    text-decoration: none;
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.25);
+    transition: 0.2s;
+  }
+
+  .btn-modern.success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35);
+  }
 </style>
 
 <div class="content-wrapper">
@@ -1132,9 +1152,19 @@ while ($row = $resultPendidikan->fetch_assoc()) {
       </div>
       <!-- JENIS PEGAWAI (GLASS GRID) -->
       <div class="jenis-wrapper">
-        <div class="jenis-header">
-          <h5>Distribusi Pegawai</h5>
-          <span>Komposisi pegawai berdasarkan jenis kepegawaian</span>
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="jenis-header">
+            <h5>Distribusi Pegawai</h5>
+            <span>Komposisi pegawai berdasarkan jenis kepegawaian</span>
+          </div>
+
+          <a href="./export_all_pegawai.php?jenis=semua_pegawai"
+            class="btn-modern success"
+            target="_blank"
+            rel="noopener noreferrer">
+            <i class="fas fa-download"></i>
+            <span>Export Semua Pegawai</span>
+          </a>
         </div>
         <div class="jenis-row">
           <?php
