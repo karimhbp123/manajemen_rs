@@ -316,7 +316,7 @@ WHERE jabatan IS NOT NULL
 AND jabatan <> ''
 GROUP BY jabatan_bersih
 ORDER BY total DESC
-LIMIT 10
+LIMIT 12
 ";
 
 $resultJabatan = $koneksi->query($queryJabatan);
@@ -1203,7 +1203,7 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
 
   .jabatan-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
   }
 
@@ -1383,7 +1383,7 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
             target="_blank"
             rel="noopener noreferrer">
             <i class="fas fa-download"></i>
-            <span>Export Semua Pegawai</span>
+            <span>Export Excel - Semua Pegawai</span>
           </a>
         </div>
         <div class="jenis-row">
@@ -1470,8 +1470,8 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
         <div class="d-flex justify-content-between align-items-center mb-3">
 
           <div class="jenis-header">
-            <h5>Top 10 Jabatan</h5>
-            <span>Jabatan dengan jumlah pegawai terbanyak</span>
+            <h5>Top Jabatan Pegawai</h5>
+            <span>Urutan jabatan berdasarkan jumlah pegawai aktif</span>
           </div>
 
           <a
