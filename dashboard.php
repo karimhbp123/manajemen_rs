@@ -268,6 +268,78 @@ while ($row = $resultPendidikan->fetch_assoc()) {
   $chartLabel[] = $row['pendidikan'];
   $chartData[] = (int)$row['total'];
 }
+
+$queryJabatan = "
+SELECT
+    UPPER(
+        TRIM(
+            REPLACE(
+                REPLACE(jabatan,'JF ',''),
+                'JF',
+                ''
+            )
+        )
+    ) AS jabatan_bersih,
+    COUNT(*) AS total
+FROM (
+
+    SELECT jabatan FROM pegawai_pns
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_p3k_penuh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_p3k_paruh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_tetap
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_kontrak
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_mitra
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+) x
+WHERE jabatan IS NOT NULL
+AND jabatan <> ''
+GROUP BY jabatan_bersih
+ORDER BY total DESC
+LIMIT 10
+";
+
+$resultJabatan = $koneksi->query($queryJabatan);
+
+$jabatanData = [];
+
+while ($row = $resultJabatan->fetch_assoc()) {
+  $jabatanData[] = $row;
+}
+
+$queryJabatanAll = str_replace(
+  "LIMIT 10",
+  "",
+  $queryJabatan
+);
+
+$resultJabatanAll = $koneksi->query($queryJabatanAll);
+
+$jabatanAll = [];
+
+while ($row = $resultJabatanAll->fetch_assoc()) {
+  $jabatanAll[] = $row;
+}
 ?>
 
 <?php require_once($base_path . 'layout/header.php'); ?>
@@ -1085,6 +1157,50 @@ while ($row = $resultPendidikan->fetch_assoc()) {
     transform: translateY(-2px);
     box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35);
   }
+
+  .jabatan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  @media(max-width:992px) {
+    .jabatan-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media(max-width:576px) {
+    .jabatan-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .jabatan-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px;
+    transition: .3s;
+  }
+
+  .jabatan-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+  }
+
+  .jabatan-nama {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    min-height: 38px;
+  }
+
+  .jabatan-total {
+    font-size: 24px;
+    font-weight: 700;
+    color: #4f46e5;
+  }
 </style>
 
 <div class="content-wrapper">
@@ -1244,6 +1360,66 @@ while ($row = $resultPendidikan->fetch_assoc()) {
           </table>
         </div>
       </div>
+
+      <div class="pendidikan-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+          <div class="jenis-header">
+            <h5>Top 10 Jabatan</h5>
+            <span>Jabatan dengan jumlah pegawai terbanyak</span>
+          </div>
+
+          <button
+            class="btn-modern success"
+            data-toggle="modal"
+            data-target="#modalJabatan">
+            <i class="fas fa-list"></i>
+            Lihat Semua
+          </button>
+
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover table-pendidikan">
+            <thead>
+              <tr>
+                <th width="8%">No</th>
+                <th>Jabatan</th>
+                <th width="15%">Jumlah</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <?php $no = 1; ?>
+
+              <?php foreach ($jabatanData as $j): ?>
+
+                <tr>
+                  <td><?= $no++ ?></td>
+
+                  <td style="text-align:left;">
+                    <?= htmlspecialchars($j['jabatan_bersih']) ?>
+                  </td>
+
+                  <td>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="height:8px;background:#6366f1;border-radius:10px;width:<?= ($j['total'] / $jabatanData[0]['total']) * 100 ?>%;min-width:20px;">
+                      </div>
+                      <strong><?= $j['total'] ?></strong>
+                    </div>
+                  </td>
+                </tr>
+
+              <?php endforeach; ?>
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
     </div>
   </section>
 
@@ -1287,6 +1463,67 @@ while ($row = $resultPendidikan->fetch_assoc()) {
       <div class="modal-body" id="notifContent">
         Loading...
       </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modalJabatan">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+
+      <div class="modal-header custom-header">
+        <h5 class="modal-title">
+          <i class="fas fa-briefcase"></i>
+          Semua Jabatan Pegawai
+        </h5>
+
+        <button
+          type="button"
+          class="close-btn"
+          data-dismiss="modal">
+          &times;
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <table class="table table-bordered table-hover table-pendidikan">
+
+          <thead>
+            <tr>
+              <th width="8%">No</th>
+              <th>Jabatan</th>
+              <th width="15%">Jumlah</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <?php $no = 1; ?>
+
+            <?php foreach ($jabatanAll as $j): ?>
+
+              <tr>
+                <td><?= $no++ ?></td>
+
+                <td style="text-align:left;">
+                  <?= htmlspecialchars($j['jabatan_bersih']) ?>
+                </td>
+
+                <td>
+                  <span class="badge-total">
+                    <?= $j['total'] ?>
+                  </span>
+                </td>
+              </tr>
+
+            <?php endforeach; ?>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
   </div>
 </div>
