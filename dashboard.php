@@ -1201,48 +1201,109 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
     box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35);
   }
 
-  .jabatan-grid {
+  .jabatan-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 
-  @media(max-width:992px) {
-    .jabatan-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media(max-width:576px) {
-    .jabatan-grid {
+  @media(max-width:768px) {
+    .jabatan-list {
       grid-template-columns: 1fr;
     }
   }
 
-  .jabatan-card {
+  .jabatan-item {
     background: #fff;
     border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 14px;
-    transition: .3s;
+    border-radius: 12px;
+    padding: 8px 12px;
+    transition: .25s;
   }
 
-  .jabatan-card:hover {
-    transform: translateY(-3px);
+  .jabatan-item:hover {
+    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
   }
 
-  .jabatan-nama {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    min-height: 38px;
+  .jabatan-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
   }
 
-  .jabatan-total {
-    font-size: 24px;
+  .jabatan-name {
+    color: #374151;
+    font-size: 11px;
     font-weight: 700;
+  }
+
+  .jabatan-progress {
+    height: 5px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+
+  .jabatan-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5, #06b6d4);
+    border-radius: 999px;
+  }
+
+  .badge-total {
+    height: 22px;
+    min-width: 34px;
+    font-size: 10px;
+  }
+
+  #modalJabatan .modal-dialog {
+    margin: 40px auto;
+  }
+
+  #modalJabatan .modal-body {
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    padding-bottom: 40px;
+  }
+
+  #modalJabatan .modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  #modalJabatan table {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  #modalJabatan thead th {
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  #modalJabatan tbody tr {
+    transition: .2s;
+  }
+
+  #modalJabatan tbody tr:hover {
+    background: #eef2ff;
+  }
+
+  #modalJabatan tbody td {
+    vertical-align: middle;
+    font-size: 13px;
+  }
+
+  #modalJabatan .badge-light {
+    background: #eef2ff;
     color: #4f46e5;
+    font-weight: 700;
   }
 </style>
 
@@ -1419,43 +1480,36 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
             data-target="#modalJabatan">
             <i class="fas fa-list"></i>
             Lihat Semua
-              </a>
+          </a>
 
         </div>
 
-        <div class="table-responsive">
-          <table class="table table-bordered table-hover table-pendidikan">
-            <thead>
-              <tr>
-                <th>Jabatan</th>
-                <th width="15%">Jumlah</th>
-              </tr>
-            </thead>
+        <div class="jabatan-list">
 
-            <tbody>
+          <?php foreach ($jabatanData as $j): ?>
 
+            <div class="jabatan-item">
 
-              <?php foreach ($jabatanData as $j): ?>
+              <div class="jabatan-head">
+                <span class="jabatan-name">
+                  <?= htmlspecialchars($j['jabatan_bersih']) ?>
+                </span>
 
-                <tr>
+                <span class="badge-total">
+                  <?= $j['total'] ?>
+                </span>
+              </div>
 
-                  <td style="text-align:left;">
-                    <?= htmlspecialchars($j['jabatan_bersih']) ?>
-                  </td>
+              <div class="jabatan-progress">
+                <div class="jabatan-progress-bar"
+                  style="width:<?= ($j['total'] / $jabatanData[0]['total']) * 100 ?>%">
+                </div>
+              </div>
 
-                  <td>
-                    <div style="display:flex;align-items:center;gap:10px">
-                      <div style="height:8px;background:#6366f1;border-radius:10px;width:<?= ($j['total'] / $jabatanData[0]['total']) * 100 ?>%;min-width:20px;">
-                      </div>
-                      <strong><?= $j['total'] ?></strong>
-                    </div>
-                  </td>
-                </tr>
+            </div>
 
-              <?php endforeach; ?>
+          <?php endforeach; ?>
 
-            </tbody>
-          </table>
         </div>
 
       </div>
@@ -1524,33 +1578,39 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
         </button>
       </div>
 
-      <div class="modal-body">
-
-        <table class="table table-bordered table-hover table-pendidikan">
-
-          <thead>
-            <tr>
-              <th>Jabatan</th>
-              <th width="15%">Jumlah</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <?php foreach ($jabatanAll as $j): ?>
+      <div class="modal-body p-3">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-primary text-white">
               <tr>
-                <td style="text-align:left;">
-                  <?= htmlspecialchars($j['jabatan_bersih']) ?>
-                </td>
-
-                <td>
-                  <span class="badge-total">
-                    <?= $j['total'] ?>
-                  </span>
-                </td>
+                <th width="70">No</th>
+                <th>Jabatan</th>
+                <th width="120" class="text-center">Jumlah</th>
               </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <?php $no = 1; ?>
+              <?php foreach ($jabatanAll as $j): ?>
+                <tr class="table table-bordered">
+                  <td class="text-center">
+                    <span class="badge badge-light px-3 py-2">
+                      <?= $no++ ?>
+                    </span>
+                  </td>
+                  <td>
+                    <i class="text-primary mr-2"></i>
+                    <?= htmlspecialchars($j['jabatan_bersih']) ?>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge-total">
+                      <?= $j['total'] ?>
+                    </span>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
