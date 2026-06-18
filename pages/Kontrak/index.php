@@ -954,7 +954,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                 </tr>
               </thead>
               <?php
-              $query = "SELECT * FROM pegawai_kontrak";
+              $query = "SELECT * FROM pegawai_kontrak ORDER BY nama ASC";
               $result = $koneksi->query($query);
               $no = 1;
               ?>

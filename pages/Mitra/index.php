@@ -809,7 +809,7 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                 </tr>
               </thead>
               <?php
-              $query = "SELECT * FROM pegawai_mitra";
+              $query = "SELECT * FROM pegawai_mitra ORDER BY nama ASC";
               $result = $koneksi->query($query);
               $no = 1;
               ?>

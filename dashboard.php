@@ -327,11 +327,54 @@ while ($row = $resultJabatan->fetch_assoc()) {
   $jabatanData[] = $row;
 }
 
-$queryJabatanAll = str_replace(
-  "LIMIT 10",
-  "",
-  $queryJabatan
-);
+$queryJabatanAll = "
+SELECT
+    UPPER(
+        TRIM(
+            REPLACE(
+                REPLACE(jabatan,'JF ',''),
+                'JF',
+                ''
+            )
+        )
+    ) AS jabatan_bersih,
+    COUNT(*) AS total
+FROM (
+
+    SELECT jabatan FROM pegawai_pns
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_p3k_penuh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_p3k_paruh_waktu
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_tetap
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_kontrak
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+    UNION ALL
+
+    SELECT jabatan FROM pegawai_mitra
+    WHERE TRIM(UPPER(status_pegawai))='AKTIF'
+
+) x
+WHERE jabatan IS NOT NULL
+AND jabatan <> ''
+GROUP BY jabatan_bersih
+ORDER BY jabatan_bersih ASC
+";
 
 $resultJabatanAll = $koneksi->query($queryJabatanAll);
 
@@ -1370,13 +1413,13 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
             <span>Jabatan dengan jumlah pegawai terbanyak</span>
           </div>
 
-          <button
+          <a
             class="btn-modern success"
             data-toggle="modal"
             data-target="#modalJabatan">
             <i class="fas fa-list"></i>
             Lihat Semua
-          </button>
+              </a>
 
         </div>
 
@@ -1384,7 +1427,6 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
           <table class="table table-bordered table-hover table-pendidikan">
             <thead>
               <tr>
-                <th width="8%">No</th>
                 <th>Jabatan</th>
                 <th width="15%">Jumlah</th>
               </tr>
@@ -1392,12 +1434,10 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
 
             <tbody>
 
-              <?php $no = 1; ?>
 
               <?php foreach ($jabatanData as $j): ?>
 
                 <tr>
-                  <td><?= $no++ ?></td>
 
                   <td style="text-align:left;">
                     <?= htmlspecialchars($j['jabatan_bersih']) ?>
@@ -1490,21 +1530,14 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
 
           <thead>
             <tr>
-              <th width="8%">No</th>
               <th>Jabatan</th>
               <th width="15%">Jumlah</th>
             </tr>
           </thead>
 
           <tbody>
-
-            <?php $no = 1; ?>
-
             <?php foreach ($jabatanAll as $j): ?>
-
               <tr>
-                <td><?= $no++ ?></td>
-
                 <td style="text-align:left;">
                   <?= htmlspecialchars($j['jabatan_bersih']) ?>
                 </td>
@@ -1515,13 +1548,9 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
                   </span>
                 </td>
               </tr>
-
             <?php endforeach; ?>
-
           </tbody>
-
         </table>
-
       </div>
 
     </div>
