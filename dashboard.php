@@ -1259,10 +1259,6 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
     font-size: 10px;
   }
 
-  #modalJabatan .modal-dialog {
-    margin: 40px auto;
-  }
-
   #modalJabatan .modal-body {
     max-height: calc(100vh - 160px);
     overflow-y: auto;
@@ -1545,6 +1541,7 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
     }
   </script>
 </div>
+
 <div class="modal fade" id="notifModal">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
@@ -1560,16 +1557,15 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
     </div>
   </div>
 </div>
-<div class="modal fade" id="modalJabatan">
-  <div class="modal-dialog modal-xl modal-dialog-centered">
-    <div class="modal-content">
 
+<div class="modal fade" id="modalJabatan">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
       <div class="modal-header custom-header">
         <h5 class="modal-title">
           <i class="fas fa-briefcase"></i>
           Semua Jabatan Pegawai
         </h5>
-
         <button
           type="button"
           class="close-btn"
@@ -1578,13 +1574,13 @@ while ($row = $resultJabatanAll->fetch_assoc()) {
         </button>
       </div>
 
-      <div class="modal-body p-3">
+      <div class="modal-body">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table table-centered align-middle mb-0">
             <thead class="bg-primary text-white">
               <tr>
-                <th width="70">No</th>
-                <th>Jabatan</th>
+                <th width="70" class="text-center">No</th>
+                <th class="text-center">Jabatan</th>
                 <th width="120" class="text-center">Jumlah</th>
               </tr>
             </thead>
