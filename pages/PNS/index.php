@@ -983,7 +983,27 @@ $aman    = $dataNotif['aman'] ?? 0;
                 </tr>
               </thead>
               <?php
-              $query = "SELECT * FROM pegawai_pns";
+              $search = trim($_GET['search'] ?? '');
+
+              if ($search != '') {
+
+                $safe = mysqli_real_escape_string($koneksi, $search);
+
+                $query = "
+        SELECT *
+        FROM pegawai_pns
+        WHERE nama LIKE '%$safe%'
+        ORDER BY nama ASC
+    ";
+              } else {
+
+                $query = "
+        SELECT *
+        FROM pegawai_pns
+        ORDER BY nama ASC
+    ";
+              }
+
               $result = $koneksi->query($query);
               $no = 1;
               ?>

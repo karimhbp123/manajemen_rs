@@ -9,11 +9,15 @@ if (!isset($_SESSION['login'])) {
 // base
 $base_url  = '/manajemen_rs/';
 $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
+
+
+// KONEKSI DULU
+require_once($base_path . 'config/db.php');
+
 ?>
 
 <?php require_once($base_path . 'layout/header.php'); ?>
 <?php require_once($base_path . 'layout/sidebar.php'); ?>
-<?php require_once($base_path . 'config/db.php'); ?>
 
 <style>
   /* GLOBAL LAYOUT */
@@ -954,7 +958,27 @@ $base_path = $_SERVER['DOCUMENT_ROOT'] . $base_url;
                 </tr>
               </thead>
               <?php
-              $query = "SELECT * FROM pegawai_kontrak ORDER BY nama ASC";
+              $search = trim($_GET['search'] ?? '');
+
+              if ($search != '') {
+
+                $safe = mysqli_real_escape_string($koneksi, $search);
+
+                $query = "
+                  SELECT *
+                  FROM pegawai_kontrak
+                  WHERE nama LIKE '%$safe%'
+                  ORDER BY nama ASC
+              ";
+                        } else {
+
+                          $query = "
+                  SELECT *
+                  FROM pegawai_kontrak
+                  ORDER BY nama ASC
+              ";
+              }
+
               $result = $koneksi->query($query);
               $no = 1;
               ?>

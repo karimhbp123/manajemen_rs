@@ -11,6 +11,22 @@
   </a>
 
   <div class="sidebar">
+    <div class="px-3 mb-3 mt-2">
+      <form action="<?= $base_url ?>search.php" method="GET">
+        <div class="sidebar-search">
+          <input
+            type="text"
+            id="searchInput"
+            name="q"
+            value="<?= htmlspecialchars($_GET['search'] ?? $_GET['q'] ?? '') ?>"
+            placeholder="Cari nama pegawai...">
+
+          <button type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
     <nav>
       <ul class="nav nav-pills nav-sidebar flex-column">
 
@@ -18,7 +34,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>dashboard.php"
-             class="nav-link <?= (strpos($current_url, '/dashboard.php') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/dashboard.php') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-home"></i>
             <p>Dashboard</p>
           </a>
@@ -28,7 +44,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/PNS"
-             class="nav-link <?= (strpos($current_url, '/pages/PNS') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/PNS') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-user-tie"></i>
             <p>PNS</p>
           </a>
@@ -36,7 +52,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/P3K-Penuh-Waktu"
-             class="nav-link <?= (strpos($current_url, '/pages/P3K-Penuh-Waktu') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/P3K-Penuh-Waktu') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-user-check"></i>
             <p>PPPK Penuh</p>
           </a>
@@ -44,7 +60,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/P3K-Paruh-Waktu"
-             class="nav-link <?= (strpos($current_url, '/pages/P3K-Paruh-Waktu') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/P3K-Paruh-Waktu') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-user-clock"></i>
             <p>PPPK Paruh</p>
           </a>
@@ -52,7 +68,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/Tetap"
-             class="nav-link <?= (strpos($current_url, '/pages/Tetap') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/Tetap') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-user-shield"></i>
             <p>Tetap</p>
           </a>
@@ -60,7 +76,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/Kontrak"
-             class="nav-link <?= (strpos($current_url, '/pages/Kontrak') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/Kontrak') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-user-edit"></i>
             <p>Kontrak</p>
           </a>
@@ -68,7 +84,7 @@
 
         <li class="nav-item">
           <a href="<?= $base_url ?>pages/Mitra"
-             class="nav-link <?= (strpos($current_url, '/pages/Mitra') !== false) ? 'active' : '' ?>">
+            class="nav-link <?= (strpos($current_url, '/pages/Mitra') !== false) ? 'active' : '' ?>">
             <i class="nav-icon fas fa-users"></i>
             <p>Mitra</p>
           </a>

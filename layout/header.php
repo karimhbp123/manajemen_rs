@@ -218,6 +218,51 @@
       .main-footer {
         transition: margin-left 0.3s ease;
       }
+
+      .sidebar-search {
+        position: relative;
+      }
+
+      .sidebar-search input {
+        width: 100%;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .08);
+        color: #fff;
+        padding: 0 45px 0 15px;
+        transition: .25s;
+        font-size: 13px;
+      }
+
+      .sidebar-search input::placeholder {
+        color: rgba(255, 255, 255, .6);
+      }
+
+      .sidebar-search input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, .12);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, .3);
+      }
+
+      .sidebar-search button {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 8px;
+        background: #6366f1;
+        color: #fff;
+        cursor: pointer;
+        transition: .2s;
+      }
+
+      .sidebar-search button:hover {
+        background: #4f46e5;
+      }
     </style>
   </head>
 
