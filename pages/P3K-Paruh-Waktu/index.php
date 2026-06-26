@@ -1041,7 +1041,10 @@ require_once($base_path . 'config/db.php');
                         <div class="action-group">
                           <button
                             class="action-btn view"
-                            onclick="showDetail(<?= $row['id']; ?>, '<?= $row['nama']; ?>')"
+                            onclick='showDetail(
+    <?= (int)$row["id"]; ?>,
+    <?= json_encode(htmlspecialchars($row["nama"], ENT_QUOTES, "UTF-8")); ?>
+  )'
                             title="Detail">
                             <i class="fas fa-eye"></i>
                           </button>

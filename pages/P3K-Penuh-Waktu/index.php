@@ -1071,9 +1071,12 @@ $result = $koneksi->query($query);
                       </td>
                       <td class="col-aksi text-center">
                         <div class="action-group">
-                          <button
+                           <button
                             class="action-btn view"
-                            onclick="showDetail(<?= $row['id']; ?>, '<?= $row['nama']; ?>')"
+                            onclick='showDetail(
+    <?= (int)$row["id"]; ?>,
+    <?= json_encode(htmlspecialchars($row["nama"], ENT_QUOTES, "UTF-8")); ?>
+  )'
                             title="Detail">
                             <i class="fas fa-eye"></i>
                           </button>
