@@ -212,8 +212,33 @@ $result = $koneksi->query($query);
             <?php if ($result && $result->num_rows > 0): ?>
                 <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td title="<?= $row['nama']; ?>">
-                            <?= $row['nama']; ?>
+                        <td class="col-nama">
+                            <?php
+                            $nama = trim($row['nama']);
+                            $gelarDepanList = ['dr.', 'drg.', 'prof.', 'ir.', 'h.', 'hj.'];
+
+                            $words = explode(' ', $nama);
+                            $firstWord = strtolower($words[0]);
+
+                            if (in_array($firstWord, $gelarDepanList)) {
+                                $gelarDepan = array_shift($words);
+                                $sisaNama = implode(' ', $words);
+
+                                if (strpos($sisaNama, ',') !== false) {
+                                    list($namaUtama, $gelarBelakang) = explode(',', $sisaNama, 2);
+                                    echo $gelarDepan . ' ' . mb_strtoupper(trim($namaUtama), 'UTF-8') . ', ' . trim($gelarBelakang);
+                                } else {
+                                    echo $gelarDepan . ' ' . mb_strtoupper($sisaNama, 'UTF-8');
+                                }
+                            } else {
+                                if (strpos($nama, ',') !== false) {
+                                    list($namaUtama, $gelarBelakang) = explode(',', $nama, 2);
+                                    echo mb_strtoupper(trim($namaUtama), 'UTF-8') . ', ' . trim($gelarBelakang);
+                                } else {
+                                    echo mb_strtoupper($nama, 'UTF-8');
+                                }
+                            }
+                            ?>
                         </td>
                         <td><?= $row['nip']; ?></td>
                         <td><?= $row['jabatan']; ?></td>
