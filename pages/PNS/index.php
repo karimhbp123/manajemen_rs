@@ -923,7 +923,7 @@ $aman    = $dataNotif['aman'] ?? 0;
           <div class="table-toolbar">
             <div class="search-modern">
               <i class="fas fa-search"></i>
-              <input type="text" id="searchInput" placeholder="Cari nama pegawai...">
+              <input type="text" id="pegawaiSearch" placeholder="Cari nama pegawai...">
               <span class="clear-btn" id="clearSearch">&times;</span>
             </div>
             <select id="filterStatus" class="filter-modern">
@@ -1172,7 +1172,7 @@ $aman    = $dataNotif['aman'] ?? 0;
       }
     }
 
-    const searchInput = document.getElementById('searchInput');
+    const searchInput = document.getElementById('pegawaiSearch');
     const clearBtn = document.getElementById('clearSearch');
     searchInput.addEventListener('keyup', function() {
       const keyword = this.value.toLowerCase();

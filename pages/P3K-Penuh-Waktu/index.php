@@ -894,7 +894,7 @@ require_once($base_path . 'config/db.php');
           <div class="table-toolbar">
             <div class="search-modern">
               <i class="fas fa-search"></i>
-              <input type="text" id="searchInput" placeholder="Cari nama pegawai...">
+              <input type="text" id="pegawaiSearch" placeholder="Cari nama pegawai...">
               <span class="clear-btn" id="clearSearch">&times;</span>
             </div>
             <select id="filterStatus" class="filter-modern">
@@ -1157,7 +1157,7 @@ $result = $koneksi->query($query);
         });
     }
 
-    const searchInput = document.getElementById('searchInput');
+    const searchInput = document.getElementById('pegawaiSearch');
     const clearBtn = document.getElementById('clearSearch');
 
     searchInput.addEventListener('keyup', function() {
