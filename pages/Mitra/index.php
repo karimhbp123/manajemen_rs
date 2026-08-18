@@ -711,6 +711,127 @@ require_once($base_path . 'config/db.php');
   .col-alamat {
     position: relative;
   }
+
+  /* MODAL CONTAINER */
+  .modal-dialog {
+    max-width: 850px;
+    margin-top: 60px;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  }
+
+  /* HEADER PREMIUM */
+  .modal-header.custom-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #4f46e5, #06b6d4);
+    box-shadow:
+      0 6px 20px rgba(79, 70, 229, 0.35),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+    border-bottom: none;
+    overflow: hidden;
+  }
+
+  /* efek cahaya (biar gak flat) */
+  .modal-header.custom-header::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center,
+        rgba(255, 255, 255, 0.25),
+        transparent 60%);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* garis bawah glowing tipis */
+  .modal-header.custom-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #22d3ee, #a78bfa);
+    opacity: 0.8;
+  }
+
+  /* TITLE */
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.4px;
+  }
+
+  /* icon jadi lebih hidup */
+  .modal-title i {
+    font-size: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  /* CLOSE BUTTON */
+  .close-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+
+  .close-btn:hover {
+    background: #ef4444;
+    transform: rotate(90deg) scale(1.05);
+    box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+  }
+
+  /* BODY (SCROLL AREA) */
+  .modal-body {
+    overflow-y: auto;
+    padding: 18px;
+    background: #f9fafb;
+  }
+
+  /* scrollbar modern */
+  .modal-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
 </style>
 
 
@@ -799,7 +920,6 @@ require_once($base_path . 'config/db.php');
                   <th>NO HP</th>
                   <th>EMAIL</th>
                   <th>STATUS</th>
-                  <th>MASA BERLAKU SIP</th>
                   <th>AKSI</th>
                 </tr>
                 <tr class="thead-simple" style="display:none;">
@@ -820,18 +940,18 @@ require_once($base_path . 'config/db.php');
                 $safe = mysqli_real_escape_string($koneksi, $search);
 
                 $query = "
-        SELECT *
-        FROM pegawai_mitra
-        WHERE nama LIKE '%$safe%'
-        ORDER BY nama ASC
-    ";
-              } else {
+                    SELECT *
+                    FROM pegawai_mitra
+                    WHERE nama LIKE '%$safe%'
+                    ORDER BY nama ASC
+                ";
+                          } else {
 
-                $query = "
-        SELECT *
-        FROM pegawai_mitra
-        ORDER BY nama ASC
-    ";
+                            $query = "
+                    SELECT *
+                    FROM pegawai_mitra
+                    ORDER BY nama ASC
+                ";
               }
 
               $result = $koneksi->query($query);
@@ -897,17 +1017,17 @@ require_once($base_path . 'config/db.php');
                         }
                         ?>
                       </td>
-                      <td class="col-masa-berlaku">
-                        <?php
-                        if (!empty($row['masa_berlaku'])) {
-                          echo date('d-m-Y', strtotime($row['masa_berlaku']));
-                        } else {
-                          echo '-';
-                        }
-                        ?>
-                      </td>
                       <td class="col-aksi text-center">
                         <div class="action-group">
+                          <button
+                            class="action-btn view"
+                            onclick='showDetail(
+                            <?= (int)$row["id"]; ?>,
+                            <?= json_encode(htmlspecialchars($row["nama"], ENT_QUOTES, "UTF-8")); ?>
+                          )'
+                            title="Detail">
+                            <i class="fas fa-eye"></i>
+                          </button>
                           <a href="editMitra.php?id=<?= $row['id']; ?>"
                             class="action-btn edit"
                             title="Edit">
@@ -1087,10 +1207,37 @@ require_once($base_path . 'config/db.php');
         }
       });
     }
+
+    function showDetail(id, nama) {
+      document.getElementById('modalNama').innerHTML =
+        '<i class="fas fa-id-card"></i> ' + nama;
+
+      fetch('detailMitra.php?id=' + id)
+        .then(res => res.text())
+        .then(data => {
+          document.getElementById('detailContent').innerHTML = data;
+          $('#detailModal').modal('show');
+        });
+    }
     window.addEventListener('beforeunload', () => {
       localStorage.removeItem('statusFilter');
     });
   </script>
+</div>
+<div class="modal fade" id="detailModal">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header custom-header">
+        <h5 class="modal-title" id="modalNama">
+          <i class="fas fa-id-card"></i> Detail Pegawai
+        </h5>
+        <button type="button" class="close-btn" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" id="detailContent">
+        Loading...
+      </div>
+    </div>
+  </div>
 </div>
 
 <?php require_once($base_path . 'layout/footer.php'); ?>

@@ -1046,9 +1046,9 @@ require_once($base_path . 'config/db.php');
                           <button
                             class="action-btn view"
                             onclick='showDetail(
-    <?= (int)$row["id"]; ?>,
-    <?= json_encode(htmlspecialchars($row["nama"], ENT_QUOTES, "UTF-8")); ?>
-  )'
+                            <?= (int)$row["id"]; ?>,
+                            <?= json_encode(htmlspecialchars($row["nama"], ENT_QUOTES, "UTF-8")); ?>
+                          )'
                             title="Detail">
                             <i class="fas fa-eye"></i>
                           </button>

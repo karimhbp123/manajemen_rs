@@ -290,6 +290,10 @@ require_once($base_path . 'config/db.php');
                                     <input type="text" name="nama" class="form-control" placeholder="Masukkan Nama Lengkap">
                                 </div>
 
+                                <div><label>NIK</label>
+                                    <input type="text" name="nik" class="form-control" placeholder="Masukkan NIK">
+                                </div>
+
                                 <div><label>Jenis Kelamin</label>
                                     <select name="jenis_kelamin" class="form-control">
                                         <option value="">-- Pilih --</option>
@@ -317,6 +321,10 @@ require_once($base_path . 'config/db.php');
                         <div class="sub-card">
                             <div class="section-title">Kepegawaian</div>
                             <div class="row">
+
+                                <div><label>NIRP</label>
+                                    <input type="text" name="nip" class="form-control" placeholder="Masukkan NIRP">
+                                </div>
 
                                 <div><label>Jabatan</label>
                                     <input type="text" name="jabatan" class="form-control" placeholder="Masukkan Jabatan">

@@ -37,7 +37,7 @@ FROM (
     SELECT nama, nip, masa_berlaku, 'Tetap' as jenis
     FROM pegawai_tetap
     UNION ALL
-    SELECT nama, '-' as nip, masa_berlaku, 'Mitra' as jenis
+    SELECT nama, nip, masa_berlaku, 'Mitra' as jenis
     FROM pegawai_mitra
 
 ) AS semua_pegawai

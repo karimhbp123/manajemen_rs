@@ -302,6 +302,7 @@ $data = $result->fetch_assoc();
                             <div class="section-title">Identitas Pribadi</div>
                             <div class="row">
                                 <div><label>Nama</label><input type="text" name="nama" class="form-control" value="<?= $data['nama']; ?>"></div>
+                                <div><label>NIK</label><input type="text" name="nik" class="form-control" value="<?= $data['nik']; ?>"></div>
                                 <div><label>Jenis Kelamin</label>
                                     <select name="jenis_kelamin" class="form-control">
                                         <option value="Laki-laki" <?= $data['jenis_kelamin'] == 'Laki-laki' ? 'selected' : '' ?>>Laki-laki</option>
@@ -319,6 +320,7 @@ $data = $result->fetch_assoc();
                         <div class="sub-card">
                             <div class="section-title">Kepegawaian</div>
                             <div class="row">
+                                <div><label>NIRP</label><input type="text" name="nip" class="form-control" value="<?= $data['nip']; ?>"></div>
                                 <div><label>Jabatan</label><input type="text" name="jabatan" class="form-control" value="<?= $data['jabatan']; ?>"></div>
                                 <div><label>Unit Kerja</label><input type="text" name="unit" class="form-control" value="<?= $data['unit']; ?>"></div>
                                 <div>
